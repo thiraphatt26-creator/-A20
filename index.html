@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Classroom Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --p: #1a6df0;
+            --bg: #dbeafe;
+            --c: rgba(255, 255, 255, .75);
+            --t: #12263f;
+            --m: #64748b;
+            --l: rgba(100, 130, 180, .18);
+            --in: #fff;
+            --fs-base: 14px;
+            --fs-h2: 22px;
+            --spacing-main: 22px;
+        }
+        [data-t=d] {
+            --bg: #0b1630;
+            --c: rgba(25, 40, 75, .85);
+            --t: #e6eefc;
+            --m: #9fb2d4;
+            --l: rgba(255, 255, 255, .12);
+            --in: #16264a;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+        body {
+            font-family: Prompt, Sarabun, sans-serif;
+            color: var(--t);
+            font-size: var(--fs-base);
+            min-height: 100vh;
+            background: radial-gradient(at 0 0, #a9d4ff, transparent 50%), radial-gradient(at 100% 100%, #b9c8ff, transparent 50%), var(--bg);
+            background-attachment: fixed;
+        }
+        .lay {
+            display: flex;
+            min-height: 100vh;
+        }
+        .side {
+            width: 240px;
+            background: linear-gradient(180deg, #0b3a8f, #1558d6);
+            color: #fff;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: auto;
+            flex-shrink: 0;
+        }
+        .pf {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, .12);
+            border-radius: 14px;
+        }
+        .pf small {
+            display: block;
+            opacity: .75;
+            font-size: 0.85em;
+        }
+        .av {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            color: #1558d6;
+            display: grid;
+            place-items: center;
+            font-weight: 600;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .nv {
+            background: none;
+            border: 0;
+            color: #fff;
+            text-align: left;
+            padding: 11px 14px;
+            border-radius: 12px;
+            font: inherit;
+            cursor: pointer;
+            opacity: .85;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+        .nv:hover {
+            background: rgba(255, 255, 255, .15);
+        }
+        .nv.on {
+            background: linear-gradient(135deg, #38d6ff, #1a6df0);
+            color: #fff;
+            font-weight: 500;
+            opacity: 1;
+            box-shadow: 0 0 16px rgba(56, 214, 255, .45);
+        }
+        main {
+            flex: 1;
+            padding: var(--spacing-main);
+            min-width: 0;
+        }
+        .hd {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        h2 { font-size: var(--fs-h2); }
+        h3 { margin-bottom: 10px; font-size: 1.15rem; }
+        .card {
+            background: var(--c);
+            border: 1px solid var(--l);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 28px rgba(30, 80, 170, .1);
+        }
+        .tw { overflow-x: auto; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .gr2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
+        }
+        .gr2 .card { margin: 0; }
+        .sc {
+            background: var(--c);
+            border: 1px solid var(--l);
+            border-radius: 18px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid #38d6ff;
+        }
+        .sc b {
+            font-size: 2rem;
+            display: block;
+            color: var(--p);
+        }
+        .sc span { color: var(--m); font-size: 0.9rem; }
+        .b {
+            background: linear-gradient(135deg, #1a6df0, #0d8bff);
+            color: #fff;
+            border: 0;
+            padding: 10px 18px;
+            border-radius: 999px;
+            font: inherit;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(26, 109, 240, .3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.95rem;
+        }
+        .b:hover { filter: brightness(1.08); }
+        .b.g {
+            background: var(--in);
+            color: var(--p);
+            border: 1px solid var(--l);
+            box-shadow: none;
+        }
+        .b.d {
+            background: #fee2e2;
+            color: #dc2626;
+            box-shadow: none;
+        }
+        .b.s { padding: 6px 12px; font-size: 0.85rem; }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--l);
+            border-radius: 12px;
+            font: inherit;
+            background: var(--in);
+            color: var(--t);
+        }
+        input[type=checkbox], input[type=radio] { width: auto; }
+        .fl {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--m);
+            font-size: 0.9rem;
+        }
+        .fl input, .fl select, .fl textarea { margin-top: 6px; color: var(--t); }
+        .r2, .r3, .r4 {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: 1fr 1fr;
+        }
+        .r3 { grid-template-columns: 2fr 1fr; }
+        .r4 { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            padding: 11px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--l);
+        }
+        th { color: var(--m); font-weight: 500; font-size: 0.9rem; }
+        td { font-size: 0.95rem; }
+        .ac { white-space: nowrap; text-align: right; }
+        .ac .b { margin-left: 4px; }
+        .ar {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 14px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--l);
+        }
+        .li select { width: auto; flex: 1; }
+        .mu { color: var(--m); margin: 4px 0; font-size: 0.9rem; }
+        .emp { text-align: center; color: var(--m); padding: 32px; font-size: 0.95rem; }
+        code {
+            background: var(--in);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+        .tg {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background: #e2e8f0;
+            color: #334155;
+            display: inline-block;
+        }
+        .tg.ม { background: #dcfce7; color: #15803d; }
+        .tg.ส { background: #fef3c7; color: #b45309; }
+        .tg.ข { background: #fee2e2; color: #dc2626; }
+        .tg.ล { background: #dbeafe; color: #1d4ed8; }
+        .bar {
+            height: 8px;
+            background: var(--l);
+            border-radius: 99px;
+            margin: 10px 0 6px;
+            overflow: hidden;
+        }
+        .bar i {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, #1a6df0, #00b4ff);
+        }
+        .ring {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            margin: auto;
+        }
+        .ring b {
+            background: var(--bg);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 1.3rem;
+        }
+        .gpa { text-align: right; font-size: 1.05rem; margin-top: 12px; }
+        .two {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+        }
+        .two .card { margin: 0; }
+        .mo {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 25, 60, .45);
+            display: grid;
+            place-items: center;
+            z-index: 9;
+            padding: 12px;
+        }
+        .md {
+            background: var(--bg);
+            color: var(--t);
+            border-radius: 22px;
+            padding: 22px;
+            width: min(500px, 100%);
+            max-height: 90vh;
+            overflow: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translate(-50%, 80px);
+            background: #12263f;
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 30px;
+            transition: .3s;
+            z-index: 20;
+            font-size: 0.95rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        #toast.show { transform: translate(-50%, 0); }
+        .au {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            align-items: center;
+        }
+        .hero {
+            padding: 60px;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(135deg, #0a3a95, #1a6df0 60%, #38bdf8);
+        }
+        .hero h1 { font-size: 2.7rem; margin: 14px 0; }
+        .hero p { font-size: 1.05rem; opacity: .9; line-height: 1.7; }
+        .lg { font-size: 4rem; }
+        
+        .form {
+            max-width: 420px;
+            width: calc(100% - 32px);
+            margin: 20px auto;
+            padding: 28px;
+        }
+        .form h2 { text-align: center; }
+        .form .b { width: 100%; margin-top: 8px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+        .tabs .b { margin: 0; }
+        
+        #pr { display: none; }
+ 
+        @media(max-width: 1024px) {
+            :root {
+                --fs-base: 13.5px;
+                --fs-h2: 20px;
+                --spacing-main: 16px;
+            }
+            .side { width: 210px; }
+        }
+ 
+        @media(max-width: 768px) {
+            :root {
+                --fs-base: 13px;
+                --fs-h2: 18px;
+                --spacing-main: 12px;
+            }
+            .au { grid-template-columns: 1fr; }
+            .hero { min-height: auto; padding: 28px 20px; text-align: center; align-items: center; }
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 0.95rem; }
+            .lg { font-size: 3rem; }
+            .lay { flex-direction: column; }
+            .side {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 6px;
+                border-bottom: 1px solid rgba(255,255,255,0.15);
+            }
+            .pf { display: none; }
+            .nv { 
+                white-space: nowrap; 
+                padding: 8px 12px; 
+                font-size: 0.9rem;
+                border-radius: 10px;
+            }
+            .two { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .sc b { font-size: 1.6rem; }
+            .card { padding: 14px; border-radius: 16px; }
+            .ar { justify-content: stretch; }
+            .ar .b { flex: 1; justify-content: center; }
+        }
+ 
+        @media(max-width: 480px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+ 
+        @media print {
+            body.pp > *:not(#pr) { display: none !important; }
+            body.pp #pr { display: block; color: #000; padding: 20px; }
+            #pr table { border: 1px solid #000; }
+            #pr th, #pr td { border: 1px solid #000; color: #000; }
+            .tr { page-break-after: always; }
+            .tr:last-child { page-break-after: auto; }
+        }
+ 
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(26, 109, 240, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(26, 109, 240, .06) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+        .side {
+            background: linear-gradient(200deg, #050f33, #0b3a9c 60%, #1b6df0);
+            box-shadow: 4px 0 30px rgba(10, 40, 120, .25);
+        }
+        main.anim { animation: fi .25s ease-out; }
+        @keyframes fi {
+            from { opacity: 0; transform: translateY(6px); }
+        }
+        h2 {
+            background: linear-gradient(90deg, #0b3a9c, #1a9bff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        [data-t=d] h2 {
+            background: linear-gradient(90deg, #7fe8ff, #9db8ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        .card { transition: box-shadow .2s, transform .2s; }
+        .gr2 .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(30, 100, 220, .2);
+        }
+        .sc::after {
+            content: "";
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(rgba(56, 214, 255, .35), transparent 70%);
+        }
+        tr:hover td { background: rgba(56, 214, 255, .06); }
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #38d6ff;
+            border-color: transparent;
+        }
+        .au {
+            position: relative;
+            overflow: hidden;
+            background: #050f33;
+        }
+        .scene {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .au::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(90deg, rgba(4, 12, 45, .78), transparent 65%);
+        }
+        .hero { position: relative; z-index: 2; background: none; }
+        .hero h1 { text-shadow: 0 0 30px rgba(56, 214, 255, .5); }
+        .form {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, .92);
+            backdrop-filter: blur(18px);
+            --t: #12263f;
+            --m: #64748b;
+            --in: #fff;
+            --l: rgba(100, 130, 180, .25);
+            color: #12263f;
+            border-radius: 24px;
+            box-shadow: 0 0 45px rgba(56, 214, 255, .3);
+        }
+        .orbs { animation: fl 6s ease-in-out infinite alternate; }
+        @keyframes fl {
+            to { transform: translateY(-22px); }
+        }
+        .tr {
+            background: #fff;
+            color: #000;
+            padding: 26px;
+            border: 2px solid #1a3d8f;
+            margin-bottom: 16px;
+            font-family: Prompt, Sarabun, sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .trh {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            border-bottom: 3px double #1a3d8f;
+            padding-bottom: 12px;
+            line-height: 1.7;
+        }
+        .trl { flex: 1; font-size: 13px; }
+        .trc { flex: 1.2; text-align: center; }
+        .trc h1 { font-size: 22px; color: #1a3d8f; }
+        .trp {
+            width: 105px;
+            height: 135px;
+            border: 1.5px solid #1a3d8f;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            color: #888;
+            font-size: 12px;
+            text-align: center;
+        }
+        .trp img { width: 100%; height: 100%; object-fit: cover; }
+        .tr table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+        .tr th, .tr td {
+            border: 1px solid #333;
+            padding: 5px;
+            text-align: center;
+            color: #000;
+            font-size: 12.5px;
+        }
+        .tr th { background: #e6eefc; }
+        .tr td.l { text-align: left; }
+        .tr h4 { margin-top: 12px; color: #1a3d8f; }
+        .sg {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            text-align: center;
+            font-size: 13px;
+        }
+ 
+        .pill { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+        .pill button { border: 1px solid var(--l); background: var(--in); color: var(--t); padding: 6px 12px; border-radius: 999px; font: inherit; font-size: 13px; cursor: pointer; }
+        .pill button.on { color: #fff; border-color: transparent; }
+        .pill button.on.ม { background: #16a34a; } .pill button.on.ส { background: #f59e0b; } .pill button.on.ข { background: #ef4444; } .pill button.on.ล { background: #3b82f6; } .pill button.on.n { background: var(--p); }
+        .tg.r { background: #fef3c7; color: #b45309; } .tg.z { background: #fee2e2; color: #b91c1c; }
+        table.sc2 th, table.sc2 td { white-space: nowrap; text-align: center; font-size: 13px; }
+        .sticky1 { position: sticky; left: 0; background: var(--bg); z-index: 2; }
+        .cell { display: inline-block; min-width: 46px; padding: 3px 8px; border-radius: 8px; cursor: pointer; }
+        .cell:hover { outline: 2px solid #38d6ff; }
+        .c-ok { background: #dcfce7; color: #166534; } .c-wait { background: #dbeafe; color: #1d4ed8; } .c-miss { background: #fee2e2; color: #b91c1c; font-weight: 600; } .c-todo { background: #f1f5f9; color: #64748b; } .c-run { background: #fef3c7; color: #b45309; }
+        .wheelbox { display: grid; grid-template-columns: minmax(300px, 1.1fr) 1fr; gap: 16px; align-items: start; }
+        #wc { width: min(420px, 100%); height: auto; aspect-ratio: 1; display: block; margin: auto; }
+        @media (max-width: 800px) { .wheelbox { grid-template-columns: 1fr; } }
+ 
+        .qgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .qgrid[screen] { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+        .qcard { border: 1.5px dashed #1a3d8f; border-radius: 10px; padding: 8px; text-align: center; background: #fff; color: #000; break-inside: avoid; }
+        .qq { width: 150px; margin: auto; } .qn { font-weight: 600; margin-top: 4px; } .qs { font-size: 12px; }
+        .cgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .ccard { border: 1.5px dashed #1a3d8f; border-radius: 10px; padding: 10px; background: #fff; color: #000; break-inside: avoid; }
+        .ccard .cn { font-size: 16px; font-weight: 600; margin: 4px 0; } .ccard table td { border: 0; padding: 2px 6px; color: #000; }
+    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <div id="m"></div>
+    <div id="m2"></div>
+    <div id="toast"></div>
+    <div id="pr"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+ 
+    <script>
+        const CFG = { URL: 'https://kgvsrpuvkeunznwtgfma.supabase.co/rest/v1/', KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtndnNycHV2a2V1bnpud3RnZm1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyNTkwMjEsImV4cCI6MjEwNzgzNTAyMX0.GVtQ9X2u9AX1JuMB6jsQfwQ9qlp9MvlRUrCdeKEOvKU' };
+        CFG.URL = CFG.URL.trim().replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
+        CFG.KEY = CFG.KEY.trim();
+        if (!window.supabase || CFG.URL.includes('YOUR-PROJECT') || CFG.KEY.includes('YOUR-ANON')) {
+            document.getElementById('app').innerHTML = '<div style="max-width:560px;margin:12vh auto;padding:24px;background:#fff;border-radius:16px;font-family:sans-serif"><h2>ตั้งค่า Supabase ก่อนใช้งาน</h2><p style="margin-top:10px">' + (!window.supabase ? 'โหลดไลบรารี Supabase ไม่ได้ ตรวจสอบอินเทอร์เน็ต' : 'เปิดไฟล์ index.html แล้วแก้ค่า URL และ KEY ที่บรรทัด <b>const CFG</b> ด้านบนของ script') + '</p></div>';
+            throw new Error('Supabase is not configured');
+        }
+        const sb = supabase.createClient(CFG.URL, CFG.KEY);
+        const sb2 = supabase.createClient(CFG.URL, CFG.KEY, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+        const ADMIN_EMAIL = '123@classroom.app';
+        const em = u => { u = u.trim().toLowerCase(); return (/^[a-z0-9]+$/.test(u) ? u : 'x' + [...new TextEncoder().encode(u)].map(b => b.toString(16).padStart(2, '0')).join('')) + '@classroom.app'; };
+        const px = p => 'cm_' + p;
+ 
+        const $ = s => document.querySelector(s);
+        const g = id => document.getElementById(id).value;
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        
+        let D = { users: [], classes: [], att: {}, tasks: [], notes: [], codes: [], attOpen: {} };
+        let me = null, V = 'home', sel = {}, rr = 'student';
+ 
+        let AU = null, SN = {};
+        const emptyD = () => ({ users: [], classes: [], att: {}, tasks: [], notes: [], codes: [], attOpen: {} });
+        const reme = () => { me = !AU ? null : AU.email === ADMIN_EMAIL ? gu('admin') : (D.users.find(u => u.id == AU.id) || null); };
+        const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
+        const sj = v => JSON.stringify(v, (k, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a < b ? -1 : 1)) : x);
+ 
+        const TS = [
+            { t: 'profiles', pk: ['id'],
+              rows: () => D.users.map(u => ({ id: u.id, username: u.u, full_name: u.name, role: u.role, photo: u.ph || null, extra: omit(u, ['id', 'u', 'name', 'role', 'ph', 'p']) })),
+              from: (r, d) => d.users = r.map(x => ({ id: x.id, u: x.username, name: x.full_name, role: x.role, ...(x.photo ? { ph: x.photo } : {}), ...x.extra })) },
+            { t: 'classes', pk: ['id'],
+              rows: () => D.classes.map(c => ({ id: c.id, name: c.name, subject: c.sub, owner_id: c.o, extra: omit(c, ['id', 'name', 'sub', 'o', 'm']) })),
+              from: (r, d) => d.classes = r.map(x => ({ id: x.id, name: x.name, sub: x.subject, o: x.owner_id, m: [], ...x.extra })) },
+            { t: 'class_members', pk: ['class_id', 'user_id'], par: ['class_id', 'classes'],
+              rows: () => D.classes.flatMap(c => c.m.map(u => ({ class_id: c.id, user_id: u }))),
+              from: (r, d) => { const m = new Map(d.classes.map(c => [c.id, c])); r.forEach(x => m.get(x.class_id)?.m.push(x.user_id)); } },
+            { t: 'tasks', pk: ['id'], par: ['class_id', 'classes'],
+              rows: () => D.tasks.map(t => ({ id: t.id, class_id: t.c, task_type: t.y, title: t.t, max_score: t.max ?? null, extra: omit(t, ['id', 'c', 'y', 't', 'max', 's']) })),
+              from: (r, d) => d.tasks = r.map(x => ({ id: x.id, y: x.task_type, c: x.class_id, t: x.title, ...(x.max_score != null ? { max: +x.max_score } : {}), s: {}, ...x.extra })) },
+            { t: 'submissions', pk: ['task_id', 'user_id'], par: ['task_id', 'tasks'],
+              rows: () => D.tasks.flatMap(t => Object.entries(t.s || {}).map(([u, e]) => ({ task_id: t.id, user_id: u, score: e.g ?? null, data: e }))),
+              from: (r, d) => { const m = new Map(d.tasks.map(t => [t.id, t])); r.forEach(x => { const t = m.get(x.task_id); if (t) t.s[x.user_id] = x.data; }); } },
+            { t: 'files', pk: ['id'], par: ['task_id', 'tasks'],
+              rows: () => D.tasks.flatMap(t => Object.entries(t.s || {}).flatMap(([u, e]) => (e.f || []).map(f => ({ id: f.id, task_id: t.id, user_id: u, file_name: f.name, mime_type: f.type, storage_path: f.id })))),
+              from: () => {} },
+            { t: 'attendance', pk: ['class_id', 'att_date', 'user_id'], par: ['class_id', 'classes'],
+              rows: () => Object.entries(D.att).flatMap(([k, v]) => { const [c, dt] = k.split('|'); return Object.entries(v).map(([u, st]) => ({ class_id: c, att_date: dt, user_id: u, status: st })); }),
+              from: (r, d) => r.forEach(x => { const k = x.class_id + '|' + x.att_date; (d.att[k] = d.att[k] || {})[x.user_id] = x.status; }) },
+            { t: 'notes', pk: ['id'],
+              rows: () => D.notes.map(n => ({ id: n.id, title: n.t, body: n.b || '', class_id: n.c || '', owner_id: n.o, note_date: n.d || '', extra: omit(n, ['id', 't', 'b', 'c', 'o', 'd']) })),
+              from: (r, d) => d.notes = r.map(x => ({ id: x.id, t: x.title, b: x.body, c: x.class_id, o: x.owner_id, d: x.note_date, ...x.extra })) },
+            { t: 'attendance_open', pk: ['att_date'],
+              rows: () => Object.entries(D.attOpen || {}).map(([d, o]) => ({ att_date: d, is_open: !!o })),
+              from: (r, d) => { d.attOpen = {}; r.forEach(x => d.attOpen[x.att_date] = x.is_open); } },
+            { t: 'teacher_codes', pk: ['code'],
+              rows: () => D.codes.map(c => ({ code: c.c, used_by: c.u || '' })),
+              from: (r, d) => d.codes = r.map(x => ({ c: x.code, u: x.used_by })) }
+        ];
+        const kf = (sp, r) => sp.pk.map(k => r[k]).join('|');
+        const snap = () => { SN = {}; TS.forEach(sp => { SN[sp.t] = new Map(sp.rows().map(r => [kf(sp, r), { j: sj(r), r }])); }); };
+        async function fetchAll(sp) {
+            let a = [], i = 0;
+            for (;;) {
+                let q = sb.from(sp.t).select('*'); sp.pk.forEach(k => q = q.order(k));
+                const { data, error } = await q.range(i, i + 999);
+                if (error) throw new Error(sp.t + ': ' + error.message);
+                a = a.concat(data); if (data.length < 1000) return a; i += 1000;
+            }
+        }
+        async function loadD() {
+            try {
+                const all = await Promise.all(TS.map(fetchAll)), d = emptyD();
+                TS.forEach((sp, i) => sp.from(all[i], d));
+                try { d.dark = localStorage.dark === '1'; } catch (e) {} D = d; snap(); return true;
+            } catch (e) { toast('Database: ' + e.message); return false; }
+        }
+        async function startSession() {
+            const { data: { session } } = await sb.auth.getSession();
+            AU = session ? session.user : null;
+            if (!AU) { me = null; return false; }
+            if (!await loadD()) return false;
+            reme();
+            if (!me) { await sb.auth.signOut(); AU = null; toast('บัญชีนี้ถูกลบออกจากระบบแล้ว'); }
+            return !!me;
+        }
+        async function loadCloudData() {
+            $('#app').innerHTML = '<div class=emp style="padding:80px;text-align:center">กำลังโหลด...</div>';
+            try {
+                await startSession(); R();
+            }
+            catch (e) { $('#app').innerHTML = '<div class=card style="max-width:560px;margin:10vh auto"><h3>เชื่อมต่อไม่ได้</h3><p>' + esc(e.message || e) + '</p></div>'; }
+        }
+        let saving = Promise.resolve();
+        let PEND = 0;
+        const save = () => { PEND++; return (saving = saving.then(doSave).catch(e => toast('บันทึกไม่สำเร็จ: ' + (e.message || e))).finally(() => PEND--)); };
+        async function doSave() {
+            try { localStorage.dark = D.dark ? '1' : ''; } catch (e) {}
+            const cur = {};
+            TS.forEach(sp => cur[sp.t] = new Map(sp.rows().map(r => [kf(sp, r), r])));
+            for (const sp of TS) {
+                const ch = []; cur[sp.t].forEach((r, k) => { const o = SN[sp.t].get(k); if (!o || o.j !== sj(r)) ch.push(r); });
+                for (let i = 0; i < ch.length; i += 400) {
+                    const { error } = await sb.from(sp.t).upsert(ch.slice(i, i + 400), { onConflict: sp.pk.join(',') });
+                    if (error) throw new Error(sp.t + ': ' + error.message);
+                }
+            }
+            const gone = {};
+            for (const sp of [...TS].sort((a, b) => (a.par ? 1 : 0) - (b.par ? 1 : 0))) {
+                const rm = [...SN[sp.t]].filter(([k]) => !cur[sp.t].has(k)).map(([, v]) => v.r);
+                gone[sp.t] = new Set(rm.map(r => kf(sp, r)));
+                const todo = rm.filter(r => !(sp.par && gone[sp.par[1]] && gone[sp.par[1]].has(String(r[sp.par[0]]))));
+                if (!todo.length) continue;
+                if (sp.pk.length == 1) {
+                    for (let i = 0; i < todo.length; i += 200) { const { error } = await sb.from(sp.t).delete().in(sp.pk[0], todo.slice(i, i + 200).map(r => r[sp.pk[0]])); if (error) throw new Error(sp.t + ': ' + error.message); }
+                } else {
+                    const rs = await Promise.all(todo.map(r => sb.from(sp.t).delete().match(Object.fromEntries(sp.pk.map(k => [k, r[k]])))));
+                    const bad = rs.find(x => x.error); if (bad) throw new Error(sp.t + ': ' + bad.error.message);
+                }
+            }
+            SN = {}; TS.forEach(sp => SN[sp.t] = new Map([...cur[sp.t]].map(([k, r]) => [k, { j: sj(r), r }])));
+        }
+ 
+        const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+        const L = { ม: 'มา', ส: 'สาย', ข: 'ขาด', ล: 'ลา' };
+        
+        const today = () => {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        };
+        
+        const fd = s => s ? new Date(s + 'T00:00').toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+        const gu = id => id === 'admin' ? { id, name: 'ผู้ดูแลระบบ', role: 'admin' } : D.users.find(u => u.id == id);
+        const isT = () => me.role != 'student';
+        const MC = () => me.role == 'admin' ? D.classes : me.role == 'teacher' ? D.classes.filter(c => c.o == me.id) : D.classes.filter(c => c.m.includes(me.id));
+        const cn = id => { const c = D.classes.find(x => x.id == id); return c ? c.name + ' ' + c.sub : '-'; };
+        const nm = u => (gu(u) || {}).name || '(ถูกลบ)';
+        
+        const toast = m => {
+            const t = $('#toast');
+            if(!t) return;
+            t.textContent = m;
+            t.className = 'show';
+            setTimeout(() => t.className = '', 2300);
+        };
+        
+        const head = (t, a) => `<div class=hd><h2>${t}</h2><div>${a || ''}</div></div>`;
+        const emp = t => `<div class=emp>${t}</div>`;
+        
+        function fld(l, id, v, t = 'text', o) {
+            return `<label class=fl>${l}${t == 'select' ? `<select id=${id}>${o.map(x => `<option value="${esc(x[0])}" ${x[0] == v ? 'selected' : ''}>${esc(x[1])}</option>`).join('')}</select>` : t == 'area' ? `<textarea id=${id} rows=3>${esc(v)}</textarea>` : `<input id=${id} type=${t} value="${esc(v)}">`}</label>`;
+        }
+        
+        function modal(t, b, ok) {
+            $('#m').innerHTML = `<div class=mo onclick="if(event.target==this)cm()"><div class=md><h3>${t}</h3>${b}<div class=ar><button class="b g" onclick=cm()>${ok ? 'ยกเลิก' : 'ปิด'}</button>${ok ? `<button class=b onclick="${ok}">บันทึก</button>` : ''}</div></div></div>`;
+        }
+        
+        const cm = () => $('#m').innerHTML = '';
+        
+        function csv(rows, name) {
+            const s = '\ufeff' + rows.map(r => r.map(x => '"' + String(x ?? '').replace(/"/g, '""') + '"').join(',')).join('\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([s], { type: 'text/csv' }));
+            a.download = name + '.csv';
+            a.click();
+        }
+        
+        function pr(t, rows) {
+            $('#pr').innerHTML = `<h2>${esc(t)}</h2><p>พิมพ์เมื่อ ${fd(today())}</p><br><table>${rows.map((r, i) => '<tr>' + r.map(x => i ? `<td>${esc(x)}</td>` : `<th>${esc(x)}</th>`).join('') + '</tr>').join('')}</table>`;
+            document.body.classList.add('pp');
+            window.onafterprint = () => document.body.classList.remove('pp');
+            window.print();
+        }
+        
+        const ex = (rows, t, f) => f == 'csv' ? csv(rows, t) : pr(t, rows);
+ 
+        function gr(p) {
+            if (p == null) return { l: '-', gp: null };
+            const a = [[80, '4', 4], [75, '3.5', 3.5], [70, '3', 3], [65, '2.5', 2.5], [60, '2', 2], [55, '1.5', 1.5], [50, '1', 1]].find(x => p >= x[0]);
+            return a ? { l: a[1], gp: a[2] } : { l: '0', gp: 0 };
+        }
+        
+        function calc(c, u) {
+            let a = 0, m = 0; const k = {};
+            D.tasks.filter(t => t.c == c).forEach(t => { const s = t.s[u]; if (s && s.g != null && !s.run) { a += +s.g; m += +t.max; const q = cat(t); (k[q] = k[q] || { a: 0, m: 0 }); k[q].a += +s.g; k[q].m += +t.max; } });
+            let p = m ? a / m * 100 : null; const cl = D.classes.find(x => x.id == c), w = cl && cw(cl);
+            if (w && m) { let sw = 0, sp = 0; for (const q in k) if (k[q].m && +w[q] > 0) { sw += +w[q]; sp += +w[q] * k[q].a / k[q].m; } if (sw) p = sp / sw * 100; }
+            return { a, m, p, ...gr(p) };
+        }
+ 
+        const gpa = u => {
+            const v = D.classes.filter(c => c.m.includes(u)).map(c => calc(c.id, u).gp).filter(x => x != null);
+            return v.length ? (v.reduce((a, b) => a + b) / v.length).toFixed(2) : '-';
+        };
+ 
+        function scene() {
+            let s = '<svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050f33"/><stop offset="1" stop-color="#1a63d6"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12388f"/><stop offset="1" stop-color="#040c28"/></linearGradient><radialGradient id="gl"><stop offset="0" stop-color="#8ff0ff" stop-opacity=".85"/><stop offset="1" stop-color="#8ff0ff" stop-opacity="0"/></radialGradient></defs><rect width="1600" height="900" fill="url(#sg)"/><circle cx="1180" cy="210" r="170" fill="url(#gl)"/><circle cx="1180" cy="210" r="46" fill="#cffaff"/>';
+            for (let i = 0; i < 24; i++) {
+                const h = 80 + (i * 57 % 210), x = i * 70;
+                s += `<rect x="${x}" y="${580 - h}" width="56" height="${h}" fill="#0a2670" opacity=".8"/><rect x="${x + 10}" y="${592 - h}" width="7" height="7" fill="#6fe3ff" opacity=".8"/><rect x="${x + 30}" y="${610 - h}" width="7" height="7" fill="#6fe3ff" opacity=".5"/>`;
+            }
+            s += '<rect y="560" width="1600" height="340" fill="url(#fg)"/><g stroke="#3ab8ff" stroke-opacity=".35" fill="none">';
+            for (let i = -12; i <= 12; i++) s += `<line x1="800" y1="560" x2="${800 + i * 170}" y2="900"/>`;
+            for (let k = 1; k < 9; k++) s += `<line x1="0" y1="${560 + k * k * 5.3}" x2="1600" y2="${560 + k * k * 5.3}"/>`;
+            s += '</g><g fill="#061a4a">'; [0, 400, 800, 1200, 1588].forEach(x => s += `<rect x="${x}" y="0" width="12" height="560"/>`);
+            s += '<rect width="1600" height="46"/></g><g fill="#7fe8ff" opacity=".85">'; [200, 560, 920, 1280].forEach(x => s += `<rect x="${x}" y="14" width="200" height="8" rx="4"/>`);
+            s += '</g><rect x="560" y="250" width="380" height="210" rx="16" fill="#38d6ff" fill-opacity=".1" stroke="#7fe8ff" stroke-width="2"/><g fill="#7fe8ff" opacity=".6">';
+            for (let i = 0; i < 5; i++) s += `<rect x="590" y="${285 + i * 32}" width="${300 - i * 40}" height="9" rx="4"/>`;
+            s += '</g>';
+            for (let r = 0; r < 3; r++) for (let c = -2; c <= 2; c++) {
+                const w = 110 + r * 60, y = 640 + r * 85, x = 800 + c * (w + 60) - w / 2;
+                s += `<rect x="${x}" y="${y}" width="${w}" height="${14 + r * 6}" rx="6" fill="#0d2d7a" stroke="#38d6ff" stroke-width="2"/><rect x="${x + w * .3}" y="${y - 18 - r * 8}" width="${w * .4}" height="${14 + r * 8}" rx="3" fill="#38d6ff" opacity=".35"/>`;
+            }
+            s += '<g class="orbs" fill="#8ff0ff">'; [[300, 200, 6], [1450, 420, 8], [700, 130, 5], [1000, 520, 7], [150, 480, 5]].forEach(o => s += `<circle cx="${o[0]}" cy="${o[1]}" r="${o[2]}" opacity=".7"/>`);
+            return s + '</g></svg>';
+        }
+ 
+        function auth(reg) {
+            $('#app').innerHTML = `<div class=au>${scene()}<div class=hero><div class=lg>🎓</div><h1>Classroom<br>Management System</h1><p>ระบบจัดการห้องเรียนอัจฉริยะ<br>เรียนรู้ • เติบโต • ไปด้วยกัน</p></div><div class="card form">${reg ? `<h2>สมัครสมาชิก</h2><p class=mu style="text-align:center;margin-bottom:12px">สร้างบัญชีเพื่อเริ่มใช้งานระบบ</p><div class=tabs><button class="b ${rr == 'student' ? '' : 'g'}" onclick="rr='student';auth(1)">🧑‍🎓 นักเรียน</button><button class="b ${rr == 'teacher' ? '' : 'g'}" onclick="rr='teacher';auth(1)">👩‍🏫 ครู</button></div>${rr == 'teacher' ? fld('รหัสสมัครครู (ขอจากผู้ดูแลระบบ)', 'rc') : ''}${fld('ชื่อ-นามสกุล', 'rn')}${fld('อีเมล / ชื่อผู้ใช้', 'ru')}${fld('รหัสผ่าน', 'rp', '', 'password')}${fld('ยืนยันรหัสผ่าน', 'rq', '', 'password')}<button class=b onclick=reg()>สมัครสมาชิก</button><p class=mu style="text-align:center;margin-top:10px">มีบัญชีแล้ว? <a href=# onclick="auth();return false">เข้าสู่ระบบ</a></p>` : `<h2>เข้าสู่ระบบ</h2><p class=mu style="text-align:center;margin-bottom:14px">ระบบจัดการห้องเรียนอัจฉริยะ</p>${fld('อีเมล / ชื่อผู้ใช้', 'lu')}${fld('รหัสผ่าน', 'lp', '', 'password')}<label><input type=checkbox id=rm checked> จดจำฉันไว้ในระบบ</label><br><br><button class=b onclick=login()>เข้าสู่ระบบ</button><p class=mu style="text-align:center;margin-top:10px">ยังไม่มีบัญชี? <a href=# onclick="auth(1);return false">สมัครเลย</a></p>`}</div></div>`;
+            document.querySelectorAll('#lu,#lp').forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') login(); }));
+        }
+ 
+        async function login() {
+            const u = g('lu').trim(), p = g('lp');
+            if (!u || !p) return toast('กรอกชื่อผู้ใช้และรหัสผ่าน');
+            const cred = { email: em(u), password: px(p) };
+            let r = await sb.auth.signInWithPassword(cred);
+            if (r.error && /invalid login/i.test(r.error.message) && u == '123' && p == '123') {
+                const x = await sb.auth.signUp(cred);
+                if (x.error && !/registered|already/i.test(x.error.message)) return toast('สร้างบัญชีผู้ดูแลไม่สำเร็จ: ' + x.error.message);
+                r = await sb.auth.signInWithPassword(cred);
+            }
+            if (r.error) return toast(/invalid login/i.test(r.error.message) ? 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' : 'เข้าสู่ระบบไม่ได้: ' + r.error.message);
+            if (!await startSession()) return;
+            V = 'home'; R();
+        }
+ 
+        async function reg() {
+            const n = g('rn').trim(), u = g('ru').trim(), p = g('rp');
+            if (!n || !u || !p) return toast('กรอกข้อมูลให้ครบ');
+            if (p.length < 4) return toast('รหัสผ่านอย่างน้อย 4 ตัวอักษร');
+            if (p != g('rq')) return toast('รหัสผ่านไม่ตรงกัน');
+            if (u == '123') return toast('ชื่อผู้ใช้นี้ถูกใช้แล้ว');
+            const k = rr == 'teacher' ? g('rc').trim() : '';
+            if (rr == 'teacher') {
+                const c = await sb.rpc('use_code', { k, who: n, consume: false });
+                if (c.error || !c.data) return toast('รหัสสมัครครูไม่ถูกต้องหรือถูกใช้แล้ว');
+            }
+            const cred = { email: em(u), password: px(p) };
+            const x = await sb.auth.signUp(cred);
+            if (x.error && !/registered|already/i.test(x.error.message)) return toast(x.error.message);
+            let ses = x.data && x.data.session;
+            if (!x.error && !ses) { const y = await sb.auth.signInWithPassword(cred); ses = y.data && y.data.session; }
+            if (x.error || !ses) return toast('ชื่อผู้ใช้นี้ถูกใช้แล้ว');
+            AU = ses.user;
+            if (rr == 'teacher') await sb.rpc('use_code', { k, who: n, consume: true });
+            if (await loadD()) {
+                if (D.users.some(a => a.id == AU.id)) { await sb.auth.signOut(); return toast('ชื่อผู้ใช้นี้ถูกใช้แล้ว'); }
+                D.users.push({ id: AU.id, u, name: n, role: rr });
+                await save();
+            }
+            await sb.auth.signOut(); AU = null; D = emptyD();
+            toast('สมัครสำเร็จ กรุณาเข้าสู่ระบบ');
+            auth();
+        }
+ 
+        const logout = async () => { await sb.auth.signOut(); AU = null; me = null; D = emptyD(); auth(); };
+ 
+        const NT = [['home', '🏠', 'หน้าหลัก'], ['classes', '🏫', 'จัดการห้องเรียน'], ['att', '✅', 'เช็คเวลาเรียน'], ['att_history', '📅', 'ประวัติเช็คชื่อ'], ['scores', '🗂️', 'ประวัติคะแนน'], ['qr', '📷', 'สแกน QR งาน'], ['act', '📝', 'กิจกรรม/แบบประเมิน'], ['exam', '🧪', 'การสอบ'], ['hw', '📚', 'งาน/การบ้าน'], ['grades', '📊', 'ผลการเรียน'], ['export', '📤', 'ส่งออกใบเกรด'], ['report', '📈', 'รายงาน'], ['wheel', '🎡', 'วงล้อหรรษา'], ['notes', '🔔', 'แจ้งเตือน']],
+              NS = [['home', '🏠', 'หน้าหลัก'], ['tt', '🗓️', 'ตารางเรียน'], ['att', '✅', 'เช็คเวลาเรียน'], ['hw', '📚', 'งาน/การบ้าน'], ['act', '📝', 'กิจกรรม'], ['exam', '🧪', 'การสอบ'], ['scores', '🗂️', 'ประวัติคะแนน'], ['grades', '📊', 'ผลการเรียน'], ['notes', '🔔', 'แจ้งเตือน']];
+        
+        const go = v => { V = v; sel.nc = ''; R(); scrollTo(0, 0); const mn = document.querySelector('main'); if (mn) mn.classList.add('anim'); };
+ 
+        function R() {
+            document.documentElement.dataset.t = D.dark ? 'd' : '';
+            if (!me) return auth();
+            const nav = (isT() ? NT : NS).concat(me.role == 'admin' ? [['users', '👥', 'จัดการผู้ใช้']] : me.role == 'teacher' ? [['users', '👥', 'จัดการนักเรียน']] : [], [['set', '⚙️', 'ตั้งค่า']]);
+            const VW = { home, classes, att, att_history: attHistoryView, scores, wheel: wheelV, act: () => tasks('act'), exam: () => tasks('ex'), hw: () => tasks('hw'), grades, export: xp, report, notes, set, users, tt, qr: qrV };
+            $('#app').innerHTML = `<div class=lay><aside class=side><div class=pf><div class=av style="${me.ph ? `background:url(${me.ph}) center/cover` : ''}">${me.ph ? '' : esc(me.name[0])}</div><div><b>${esc(me.name)}</b><small>${{ admin: 'ผู้ดูแลระบบ', teacher: 'ครู', student: 'นักเรียน' }[me.role]}</small></div></div>${nav.map(n => `<button class="nv ${V == n[0] ? 'on' : ''}" onclick="go('${n[0]}')"><span>${n[1]}</span> <span>${n[2]}</span></button>`).join('')}</aside><main>${(VW[V] || home)()}</main></div>`;
+        }
+ 
+        const sc = (n, l) => `<div class=sc><b>${n}</b><span>${l}</span></div>`;
+        
+        function home() {
+            const cs = MC(), ids = cs.map(c => c.id), dy = new Date().getDay(), td = cs.filter(c => c.day == dy).sort((a, b) => a.t1.localeCompare(b.t1)), ts = D.tasks.filter(t => ids.includes(t.c));
+            const tl = td.length ? td.map(c => `<div class=li><div><b>${esc(c.sub)}</b><br><small>${esc(c.name)} · ${esc(c.room)}</small></div><span>${c.t1}-${c.t2}</span></div>`).join('') : emp('วันนี้ไม่มีคาบสอน/เรียน');
+            
+            if (isT()) {
+                const st = new Set(cs.flatMap(c => c.m));
+                let pend = 0;
+                ts.forEach(t => Object.values(t.s).forEach(s => { if (s.g == null && !s.run) pend++; }));
+                const a = { ม: 0, ส: 0, ข: 0, ล: 0 };
+                Object.entries(D.att).forEach(([k, v]) => { if (ids.includes(k.split('|')[0])) Object.values(v).forEach(x => a[x]++); });
+                const tot = a.ม + a.ส + a.ข + a.ล, pc = tot ? Math.round((a.ม + a.ส) / tot * 100) : 0;
+                return head('สวัสดีครับ ' + esc(me.name)) + `<div class=grid>${sc(cs.length, 'ห้องเรียน')}${sc(st.size, 'นักเรียนทั้งหมด')}${sc(ts.filter(t => t.y == 'hw').length, 'งาน/การบ้าน')}${sc(ts.filter(t => t.y == 'act').length, 'กิจกรรม/แบบประเมิน')}${sc(pend, 'รอตรวจให้คะแนน')}</div><div class=two><div class=card><h3>ตารางสอนวันนี้ (${days[dy]})</h3>${tl}</div><div class=card><h3>สถิติเข้าเรียน</h3><div class=ring style="background:conic-gradient(var(--p) ${pc}%,var(--l) 0)"><b>${tot ? pc + '%' : '-'}</b></div><p class=mu style="text-align:center">มา ${a.ม} · สาย ${a.ส} · ขาด ${a.ข} · ลา ${a.ล}</p></div></div>`;
+            }
+            
+            const un = ts.filter(t => t.y != 'ex' && !t.s[me.id]), nt = nts();
+            return head('สวัสดีครับ ' + esc(me.name)) + `<div class=grid>${sc(td.length, 'คาบเรียนวันนี้')}${sc(un.length, 'งานที่ยังไม่ส่ง')}${sc(cs.length, 'รายวิชา')}${sc(gpa(me.id), 'GPA')}</div><div class=two><div class=card><h3>ตารางเรียนวันนี้</h3>${tl}</div><div class=card><h3>เข้าร่วมห้องเรียน</h3><p class=mu>กรอกรหัสที่ครูให้</p>${fld('รหัสเข้าห้อง', 'jc')}<button class=b style="width:100%" onclick=join()>เข้าร่วม</button><h3 style="margin-top:16px">แจ้งเตือนล่าสุด</h3>${nt.slice(0, 3).map(n => `<div class=li><small>${esc(n.t)}</small></div>`).join('') || emp('ไม่มีแจ้งเตือน')}</div></div>`;
+        }
+ 
+        function join() {
+            const c = D.classes.find(x => x.code == g('jc').trim().toUpperCase());
+            if (!c) return toast('ไม่พบรหัสห้องเรียน');
+            if (c.m.includes(me.id)) return toast('คุณอยู่ในห้องนี้แล้ว');
+            c.m.push(me.id);
+            save();
+            toast('เข้าร่วมห้องสำเร็จ');
+            R();
+        }
+ 
+        function classes() {
+            const cs = MC();
+            return head('จัดการห้องเรียน', '<button class=b onclick="cf()">+ สร้างห้องเรียน</button>') + `<div class="card tw">${cs.length ? `<table><tr><th>ชั้น/วิชา</th><th>ห้อง</th><th>เวลา</th><th>นักเรียน</th><th>รหัสเข้าห้อง</th><th></th></tr>${cs.map(c => `<tr><td><b>${esc(c.name)}</b><br><small>${esc(c.sub)}</small></td><td>${esc(c.room)}</td><td>${days[c.day]} ${c.t1}-${c.t2}</td><td>${c.m.length}</td><td><code>${c.code}</code></td><td class=ac><button class="b s g" onclick="mem('${c.id}')">👥</button><button class="b s g" onclick="cf('${c.id}')">✏️</button><button class="b s d" onclick="cdel('${c.id}')">🗑</button></td></tr>`).join('')}</table>` : emp('ยังไม่มีห้องเรียน กด “สร้างห้องเรียน” เพื่อเริ่มต้น')}</div>`;
+        }
+ 
+        function cf(id) {
+            const c = D.classes.find(x => x.id == id) || {};
+            modal(id ? 'แก้ไขห้องเรียน' : 'สร้างห้องเรียน', fld('ชั้นเรียน (เช่น ม.3/1)', 'f1', c.name) + fld('วิชา', 'f2', c.sub) + fld('ห้อง/สถานที่', 'f3', c.room) + fld('วัน', 'f4', c.day ?? new Date().getDay(), 'select', days.map((d, i) => [i, d])) + `<div class=r2>${fld('เริ่ม', 'f5', c.t1 || '08:00', 'time')}${fld('สิ้นสุด', 'f6', c.t2 || '09:00', 'time')}</div>`, `cs('${id || ''}')`);
+        }
+ 
+        function cs(id) {
+            const n = g('f1').trim(), s = g('f2').trim();
+            if (!n || !s) return toast('กรอกชั้นเรียนและวิชา');
+            let c = D.classes.find(x => x.id == id);
+            if (!c) {
+                c = { id: uid(), code: Math.random().toString(36).slice(2, 7).toUpperCase(), o: me.id, m: [] };
+                D.classes.push(c);
+            }
+            Object.assign(c, { name: n, sub: s, room: g('f3'), day: +g('f4'), t1: g('f5'), t2: g('f6') });
+            save();
+            cm();
+            R();
+        }
+ 
+        function cdel(id) {
+            if (!confirm('ลบห้องเรียนนี้และข้อมูลที่เกี่ยวข้องทั้งหมด?')) return;
+            D.classes = D.classes.filter(c => c.id != id);
+            D.tasks = D.tasks.filter(t => t.c != id);
+            Object.keys(D.att).forEach(k => { if (k.split('|')[0] == id) delete D.att[k]; });
+            save();
+            R();
+        }
+ 
+        function mem(id) {
+            sel.mc = id;
+            const c = D.classes.find(x => x.id == id), av = D.users.filter(u => u.role == 'student' && !c.m.includes(u.id));
+            modal('นักเรียนใน ' + esc(c.name + ' ' + c.sub), `<p class=mu>รหัสเข้าห้อง: <code>${c.code}</code> (นักเรียนใช้เข้าร่วมเอง)</p><div class=ar style="justify-content:flex-start;margin:0 0 8px"><button class="b s g" onclick="autoNo('${id}')">🔢 เรียงเลขที่ตามชื่ออัตโนมัติ</button><button class="b s g" onclick="cm();addU('${id}')">➕ สร้างนักเรียนใหม่ในห้องนี้</button><button class="b s g" onclick="exportRoster('${id}')">📤 ส่งออกรายชื่อ</button></div>` + (c.m.length ? c.m.map(u => `<div class=li><span>${avs(gu(u) || { name: '?' })} <input type=number min=1 value="${rno(c, u)}" placeholder="เลขที่" title="เลขที่" style="width:62px;display:inline-block;padding:4px 6px" onchange="setNo('${id}','${u}',this.value)"> ${esc(nm(u))}</span><span><label class="b s g">📷<input type=file accept=image/* hidden onchange="setPh('${u}',this)"></label> <button class="b s d" onclick="rmm('${id}','${u}')">ลบ</button></span></div>`).join('') : emp('ยังไม่มีนักเรียน')) + (av.length ? `<div class=li><select id=f1>${av.map(u => `<option value=${u.id}>${esc(u.name)}</option>`).join('')}</select><button class="b s" onclick="addm('${id}')">+ เพิ่ม</button></div>` : '<p class=mu>ไม่มีนักเรียนที่เพิ่มได้เพิ่มเติม</p>'));
+        }
+ 
+        const addm = id => { D.classes.find(c => c.id == id).m.push(g('f1')); save(); mem(id); R(); },
+              rmm = (id, u) => { const c = D.classes.find(c => c.id == id); c.m = c.m.filter(x => x != u); save(); mem(id); R(); };
+ 
+        function tt() {
+            const cs = MC();
+            sel.tt = sel.tt || 'd';
+            const dy = new Date().getDay(), row = c => `<div class=li><div><b>${esc(c.sub)}</b><br><small>${esc(c.room)}</small></div><span>${c.t1}-${c.t2}</span></div>`;
+            return head('ตารางเรียน') + `<div class=tabs><button class="b ${sel.tt == 'd' ? '' : 'g'}" onclick="sel.tt='d';R()">วันนี้</button><button class="b ${sel.tt == 'w' ? '' : 'g'}" onclick="sel.tt='w';R()">สัปดาห์นี้</button></div>` + (sel.tt == 'd' ? `<div class=card><h3>${days[dy]} ${fd(today())}</h3>${cs.filter(c => c.day == dy).sort((a, b) => a.t1.localeCompare(b.t1)).map(row).join('') || emp('วันนี้ไม่มีคาบเรียน')}</div>` : days.map((d, i) => {
+                const l = cs.filter(c => c.day == i).sort((a, b) => a.t1.localeCompare(b.t1));
+                return l.length ? `<div class=card><h3>${d}</h3>${l.map(row).join('')}</div>` : '';
+            }).join('') || emp('ยังไม่มีตารางเรียน'));
+        }
+ 
+        function att() {
+            if (me.role == 'admin') return adminAttCtrl();
+            return isT() ? tAtt() : sAtt();
+        }
+ 
+        function adminAttCtrl() {
+            const t = today();
+            const isOpen = D.attOpen[t] || false;
+            return head('ควบคุมระบบเช็คชื่อ (ผู้ดูแลระบบ)') + `<div class=card style="text-align:center; padding: 30px;"><h3 style="margin-bottom:15px">สถานะการเช็คชื่อประจำวันที่ ${fd(t)}</h3><p class=mu style="margin-bottom:20px">${isOpen ? '🟢 ระบบเปิดให้ ' : '🔴 ระบบปิดรับ '}นักเรียนเช็คชื่อเข้าเรียนแล้วในขณะนี้</p><button class="b ${isOpen ? 'd' : ''}" style="font-size: 1.1rem; padding: 14px 28px;" onclick="toggleAttOpen()">${isOpen ? '🛑 ปิดการเช็คชื่อของนักเรียน' : '✨ เปิดให้เช็คชื่อ'}</button></div>`;
+        }
+ 
+        function toggleAttOpen() {
+            const t = today();
+            D.attOpen[t] = !D.attOpen[t];
+            save();
+            toast(D.attOpen[t] ? 'เปิดระบบเช็คชื่อให้นักเรียนแล้ว' : 'ปิดระบบเช็คชื่อแล้ว');
+            R();
+        }
+        
+ 
+        function sAtt() {
+            const cs = MC(), t = today(), isOpen = D.attOpen[t] || false, td = cs.filter(c => c.day == new Date().getDay());
+            return head('เช็คเวลาเรียน') + `<div class=card><h3>คาบเรียนวันนี้</h3>${!isOpen ? '<p class="mu" style="color:#dc2626; margin-bottom:12px;">⚠️ ผู้ดูแลระบบยังไม่ได้เปิดระบบเช็คชื่อในวันนี้</p>' : ''}${td.map(c => {
+                const s = (D.att[c.id + '|' + t] || {})[me.id];
+                return `<div class=li><div><b>${esc(c.sub)}</b><br><small>${c.t1}-${c.t2} · ${esc(c.room)}</small></div>${s ? `<span class="tg ${s}">ลงชื่อแล้ว (${L[s]})</span>` : isOpen ? `<button class=b onclick="ci('${c.id}')">เช็คชื่อเข้าเรียน</button>` : `<span class="tg ข">ยังไม่เปิดเช็คชื่อ</span>`}</div>`;
+            }).join('') || emp('วันนี้ไม่มีคาบเรียน')}</div><div class="card tw"><h3>ประวัติการเข้าเรียน</h3><table><tr><th>วิชา</th><th>มา</th><th>สาย</th><th>ขาด</th><th>ลา</th></tr>${cs.map(c => {
+                const k = { ม: 0, ส: 0, ข: 0, ล: 0 };
+                Object.entries(D.att).forEach(([a, v]) => { if (a.split('|')[0] == c.id && v[me.id]) k[v[me.id]]++; });
+                return `<tr><td>${esc(c.sub)}</td><td>${k.ม}</td><td>${k.ส}</td><td>${k.ข}</td><td>${k.ล}</td></tr>`;
+            }).join('')}</table></div>`;
+        }
+ 
+        function ci(id) {
+            const t = today();
+            if (!D.attOpen[t]) return toast('ผู้ดูแลระบบยังไม่ได้เปิดระบบเช็คชื่อ');
+            const c = D.classes.find(x => x.id == id), n = new Date(), m = n.getHours() * 60 + n.getMinutes(), [h, mi] = c.t1.split(':'), k = id + '|' + t;
+            D.att[k] = D.att[k] || {};
+            D.att[k][me.id] = m > +h * 60 + +mi + 15 ? 'ส' : 'ม';
+            save();
+            toast('เช็คชื่อเรียบร้อย');
+            R();
+        }
+ 
+        const BK = 'submissions';
+        const fput = async (k, b) => { const { error } = await sb.storage.from(BK).upload(k, b, { contentType: b.type || 'application/octet-stream', upsert: true }); if (error) throw error; };
+        const fget = async k => { const { data, error } = await sb.storage.from(BK).download(k); if (error) throw error; return data; };
+        const fdel = async k => { try { await sb.storage.from(BK).remove([k]); } catch (e) {} };
+        const avs = u => `<span class=av style="display:inline-grid;width:28px;height:28px;font-size:12px;vertical-align:middle;${u.ph ? `background:url(${u.ph}) center/cover` : 'background:#dbeafe'}">${u.ph ? '' : esc((u.name || '?')[0])}</span>`;
+ 
+        function setPh(u, inp) {
+            const f = inp.files[0], x = D.users.find(a => a.id == u);
+            if (!f || !x) return;
+            if (!f.type.startsWith('image/')) return toast('กรุณาเลือกไฟล์รูปภาพ');
+            const r = new FileReader();
+            r.onload = () => {
+                const i = new Image();
+                i.onload = () => {
+                    const k = Math.min(1, 400 / Math.max(i.width, i.height)), c = document.createElement('canvas');
+                    c.width = Math.round(i.width * k);
+                    c.height = Math.round(i.height * k);
+                    c.getContext('2d').drawImage(i, 0, 0, c.width, c.height);
+                    x.ph = c.toDataURL('image/jpeg', .82);
+                    save();
+                    R();
+                    if (sel.mc && $('#m').innerHTML) mem(sel.mc);
+                    toast('บันทึกรูปแล้ว');
+                };
+                i.onerror = () => toast('อ่านรูปไม่สำเร็จ');
+                i.src = r.result;
+            };
+            r.readAsDataURL(f);
+        }
+ 
+        const TY = { hw: 'งาน/การบ้าน', act: 'กิจกรรม/แบบประเมิน', ex: 'การสอบ' }, KD = { q: 'แบบทดสอบท้ายบท', m: 'สอบกลางภาค', f: 'สอบปลายภาค' };
+        
+        function tasks(ty) {
+            const T = TY[ty], ex = ty == 'ex', ids = MC().map(c => c.id), ts = D.tasks.filter(t => t.y == ty && ids.includes(t.c) && (isT() || !t.man)).sort((a, b) => (a.d || 'z').localeCompare(b.d || 'z'));
+            const inf = t => ex ? `${KD[t.k]} · ${t.dur > 0 ? t.dur + ' นาที' : 'ไม่จำกัดเวลา'} · ${t.q.length} ข้อ · รหัส ${xs(t).code || '-'}` : 'กำหนด ' + fd(t.d);
+            
+            if (isT()) return head(T, `<button class=b onclick="tf('${ty}')">+ สร้าง</button>`) + (ts.length ? `<div class=gr2>${ts.map(t => {
+                const c = D.classes.find(x => x.id == t.c), n = Object.values(t.s).filter(s => !s.run).length;
+                return `<div class=card><b>${esc(t.t)}</b> <span class=tg>${CATS[cat(t)]}</span>${t.man ? ' <span class=tg>ครูบันทึกเอง</span>' : ''}${ex ? ` <span class="tg ${t.open ? 'ม' : 'ข'}">${t.open ? 'เปิดสอบ' : 'ปิดสอบ'}</span>` : ''}<p class=mu>${esc(c.name + ' ' + c.sub)} · ${inf(t)} · เต็ม ${t.max}</p><p>${esc(t.ds)}</p><div class=bar><i style="width:${c.m.length ? n / c.m.length * 100 : 0}%"></i></div><small>${ex ? 'สอบแล้ว' : 'ส่งแล้ว'} ${n}/${c.m.length}</small><div class=ar>${ex ? `<button class="b s g" onclick="tog('${t.id}')">${t.open ? 'ปิดสอบ' : 'เปิดสอบ'}</button>` : ''}<button class="b s" onclick="tg('${t.id}')">${ex ? 'ดูผลสอบ' : 'ตรวจงาน'}</button><button class="b s g" onclick="tf('${ty}','${t.id}')">แก้ไข</button><button class="b s g" onclick="tdup('${t.id}')">คัดลอก</button><button class="b s d" onclick="tdel('${t.id}')">ลบ</button></div></div>`;
+            }).join('')}</div>` : emp('ยังไม่มีรายการ'));
+            
+            return head(T) + (ts.length ? `<div class=gr2>${ts.map(t => {
+                const s = t.s[me.id], late = !ex && !s && t.d && t.d < today();
+                let st, bt = '';
+                if (ex) {
+                    if (s && !s.run) { const X = xs(t); st = X.showScore ? `ได้ ${s.g}/${t.max}` : 'ส่งแล้ว (รอประกาศผล)'; if (X.showScore && X.showAns) bt = `<button class="b s g" onclick="exrev('${t.id}')">ดูเฉลย</button>`; }
+                    else if (s) { st = 'กำลังสอบ'; bt = `<button class="b s" onclick="exui('${t.id}')">ทำต่อ</button>`; }
+                    else if (xopen(t)) { st = 'เปิดสอบ'; bt = `<button class="b s" onclick="exs('${t.id}')">เริ่มสอบ</button>`; }
+                    else st = 'ยังไม่เปิดสอบ';
+                } else {
+                    st = s ? (s.g != null ? `ได้ ${s.g}/${t.max}` : 'ส่งแล้ว' + (s.f && s.f.length ? ' 📎' + s.f.length : '')) : late ? 'เลยกำหนด' : 'ยังไม่ส่ง';
+                    if (!(s && s.g != null)) bt = `<button class="b s" onclick="subf('${t.id}')">${s ? 'แก้ไขงาน' : 'ส่งงาน'}</button>` + (s ? ` <button class="b s g" onclick="unsub('${t.id}')">ยกเลิก</button>` : '');
+                }
+                return `<div class=card><b>${esc(t.t)}</b><p class=mu>${esc(cn(t.c))} · ${inf(t)}</p><p>${esc(t.ds)}</p><div class=ar><span class="tg ${s && !s.run ? 'ม' : late ? 'ข' : 'ส'}">${st}</span>${bt}</div></div>`;
+            }).join('')}</div>` : emp('ยังไม่มีรายการ'));
+        }
+ 
+        const qb = q => {
+            q = q || {};
+            return `<div class="qb card" style="padding:10px;margin:8px 0"><label class=fl>โจทย์<input class=qt value="${esc(q.q)}"></label>${[0, 1, 2, 3].map(i => `<label class=fl>ตัวเลือก ${i + 1}<input class=qc value="${esc((q.c || [])[i])}"></label>`).join('')}<div class=r2><label class=fl>ข้อที่ถูกต้อง<select class=qa>${[0, 1, 2, 3].map(i => `<option value=${i} ${q.a === i ? 'selected' : ''}>${i + 1}</option>`).join('')}</select></label><label class=fl>คะแนน<input type=number class=qp min=1 value="${q.p || 1}"></label></div><button class="b s d" onclick="this.closest('.qb').remove()">ลบข้อนี้</button></div>`;
+        };
+        
+        const qadd = () => $('#qs').insertAdjacentHTML('beforeend', qb());
+ 
+        function tf(ty, id) {
+            if (ty == 'ex') return exed(id);
+            const cs = MC();
+            if (!cs.length) return toast('สร้างห้องเรียนก่อน');
+            const t = D.tasks.find(x => x.id == id) || {}, ex = ty == 'ex';
+            modal(id ? 'แก้ไขรายการ' : 'สร้างรายการ', fld('ห้องเรียน', 'f1', t.c || sel.sc, 'select', cs.map(c => [c.id, c.name + ' ' + c.sub])) + fld('ชื่อ', 'f2', t.t) + (ex ? `<div class=card style="padding:10px;margin:10px 0;background:rgba(0,0,0,0.03)"><b>⚡ คัดลอกข้อความนำเข้าหลายข้อ</b><textarea id="import_text" rows="4" placeholder="วางข้อสอบตรงนี้ ตัวอย่าง:\n1. ข้อใดคือคำตอบ\nก. ตัวเลือก 1\nข. ตัวเลือก 2*\nค. ตัวเลือก 3\nง. ตัวเลือก 4"></textarea><button class="b s g" style="margin-top:6px" onclick="parseTextExam()">นำเข้าข้อความ</button><hr style="margin:10px 0;border:0;border-top:1px solid var(--l)"><label class=fl>หรืออัปโหลดไฟล์ (.txt หรือ .json)<input type=file id="import_file" accept=".txt,.json" onchange="parseFileExam(this)"></label></div><div class=r2>${fld('ประเภทการสอบ', 'f6', t.k || 'q', 'select', Object.entries(KD))}${fld('เวลาสอบ (นาที)', 'f3', t.dur || 30, 'number')}</div>${fld('สถานะ', 'f7', t.open ? 1 : 0, 'select', [[0, 'ปิดสอบ'], [1, 'เปิดสอบ']])}<div id=qs>${(t.q || []).map(q => qb(q)).join('')}</div><button class="b g s" onclick=qadd()>+ เพิ่มข้อสอบทีละข้อ</button>` : `<div class=r2>${fld('กำหนดส่ง', 'f3', t.d, 'date')}${fld('คะแนนเต็ม', 'f4', t.max || 10, 'number')}</div><div class=r2>${fld('หมวดคะแนน', 'f8', t.cat || sel.nc || 'col', 'select', CK.map(k => [k, CATS[k]]))}${fld('วิธีเก็บคะแนน', 'f9', t.man ?? (sel.nc == 'mid' || sel.nc == 'fin') ? 1 : 0, 'select', [[0, 'นักเรียนส่งงานในระบบ'], [1, 'ครูบันทึกคะแนนเอง (สอบกระดาษ ฯลฯ)']])}</div>`) + fld('รายละเอียด', 'f5', t.ds, 'area'), `tsv('${ty}','${id || ''}')`);
+            if (ex && !t.q) qadd();
+        }
+ 
+        function parseTextExam() {
+            const raw = $('#import_text').value.trim();
+            if (!raw) return toast('วางข้อความข้อสอบก่อน');
+            const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+            let currentQ = null, questions = [];
+ 
+            lines.forEach(line => {
+                if (/^\d+[\.\)]/.test(line) || !currentQ) {
+                    if (currentQ && currentQ.c.length >= 2) questions.push(currentQ);
+                    currentQ = { q: line.replace(/^\d+[\.\)]\s*/, ''), c: [], a: 0, p: 1 };
+                } else if (/^[ก-งa-dA-D][\.\)]/.test(line)) {
+                    let text = line.replace(/^[ก-งa-dA-D][\.\)]\s*/, '');
+                    if (text.endsWith('*')) {
+                        text = text.slice(0, -1);
+                        currentQ.a = currentQ.c.length;
+                    }
+                    currentQ.c.push(text);
+                }
+            });
+            if (currentQ && currentQ.c.length >= 2) questions.push(currentQ);
+ 
+            if (!questions.length) return toast('รูปแบบข้อความไม่ถูกต้อง');
+            questions.forEach(q => $('#qs').insertAdjacentHTML('beforeend', qb(q)));
+            toast(`นำเข้าข้อสอบสำเร็จ ${questions.length} ข้อ`);
+            $('#import_text').value = '';
+        }
+ 
+        function parseFileExam(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        data.forEach(q => $('#qs').insertAdjacentHTML('beforeend', qb(q)));
+                        toast(`นำเข้าข้อสอบจากไฟล์สำเร็จ ${data.length} ข้อ`);
+                    }
+                } catch (err) {
+                    $('#import_text').value = e.target.result;
+                    parseTextExam();
+                }
+            };
+            reader.readAsText(file);
+        }
+ 
+        function tsv(ty, id) {
+            const n = g('f2').trim();
+            if (!n) return toast('กรอกชื่อรายการ');
+            let q = [];
+            if (ty == 'ex') {
+                document.querySelectorAll('.qb').forEach(b => {
+                    const c = [...b.querySelectorAll('.qc')].map(i => i.value.trim()), qq = b.querySelector('.qt').value.trim(), a = +b.querySelector('.qa').value;
+                    if (qq && c.filter(Boolean).length >= 2 && c[a]) q.push({ q: qq, c, a, p: Math.max(1, Math.round(+b.querySelector('.qp').value) || 1) });
+                });
+                if (!q.length) return toast('ต้องมีข้อสอบอย่างน้อย 1 ข้อ: ใส่โจทย์ ตัวเลือกอย่างน้อย 2 ช่อง และข้อที่ถูกต้องต้องไม่ว่าง');
+            }
+            let t = D.tasks.find(x => x.id == id);
+            if (!t) { t = { id: uid(), y: ty, s: {} }; D.tasks.push(t); }
+            Object.assign(t, { c: g('f1'), t: n, ds: g('f5') });
+            if (ty == 'ex') Object.assign(t, { k: g('f6'), dur: Math.max(1, +g('f3') || 30), open: g('f7') == '1', q, max: q.reduce((a, x) => a + x.p, 0), d: '' });
+            else Object.assign(t, { d: g('f3'), max: Math.max(1, +g('f4') || 10), cat: g('f8'), man: g('f9') == '1' });
+            sel.nc = '';
+            save();
+            cm();
+            R();
+        }
+ 
+        const tog = id => { const t = D.tasks.find(x => x.id == id); if (t.open) t.done = 1; t.open = !t.open; save(); R(); },
+              tdel = id => {
+                  if (!confirm('ลบรายการนี้?')) return;
+                  const t = D.tasks.find(x => x.id == id);
+                  Object.values(t.s).forEach(s => (s.f || []).forEach(f => fdel(f.id)));
+                  D.tasks = D.tasks.filter(x => x.id != id);
+                  save();
+                  R();
+              };
+ 
+        function tg(id) {
+            const t = D.tasks.find(x => x.id == id), c = D.classes.find(x => x.id == t.c);
+            if (!c.m.length) return modal('นักเรียน', emp('ห้องนี้ยังไม่มีนักเรียน'));
+            if (t.y == 'ex') return exres(id);
+            if (0) return modal('ผลสอบ: ' + esc(t.t), c.m.map(u => {
+                const s = t.s[u];
+                return `<div class=li><span>${esc(nm(u))}</span><span>${s ? (s.run ? 'กำลังสอบ' : s.g + '/' + t.max) : 'ยังไม่สอบ'} ${s ? `<button class="b s d" onclick="exr('${id}','${u}')">ให้สอบใหม่</button>` : ''}</span></div>`;
+            }).join(''));
+            modal('ตรวจงาน: ' + esc(t.t), `<p class=mu>ติ๊กเมื่อส่งแล้ว และใส่คะแนน (เต็ม ${t.max})</p>` + c.m.map(u => {
+                const s = t.s[u];
+                return `<div class=li><label><input type=checkbox class=gc data-u=${u} ${s ? 'checked' : ''}> ${esc(nm(u))}</label><span>${s && (s.n || (s.f || []).length) ? `<button class="b s g" onclick="vw('${id}','${u}')">ดูงาน</button> ` : ''}<input type=number class=gs min=0 max=${t.max} value="${s && s.g != null ? s.g : ''}" style="width:80px;display:inline-block"></span></div>`;
+            }).join(''), `tgs('${id}')`);
+        }
+ 
+        function tgs(id) {
+            const t = D.tasks.find(x => x.id == id), cs = [...document.querySelectorAll('.gc')], ss = [...document.querySelectorAll('.gs')], o = {};
+            cs.forEach((c, i) => {
+                const u = c.dataset.u, old = t.s[u];
+                if (c.checked) {
+                    const v = ss[i].value;
+                    o[u] = { ...(old || {}), t: (old || {}).t || today(), g: v === '' ? null : Math.max(0, Math.min(+v, t.max)) };
+                } else if (old && old.f) old.f.forEach(f => fdel(f.id));
+            });
+            t.s = o;
+            save();
+            cm();
+            R();
+            toast('บันทึกคะแนนแล้ว');
+        }
+ 
+        async function vw(id, u) {
+            const s = D.tasks.find(x => x.id == id).s[u] || {};
+            $('#m2').innerHTML = `<div class=mo onclick="if(event.target==this)$('#m2').innerHTML=''"><div class=md style="width:min(600px,100%)"><h3>งานของ ${esc(nm(u))}</h3><p><b>หมายเหตุ:</b> ${esc(s.n || '-')}</p>${s.link ? `<p><b>ลิงก์แนบ:</b> <a href="${esc(s.link)}" target="_blank" rel="noopener">${esc(s.link)}</a></p>` : ''}<div id=fl style="margin-top:10px">กำลังดึงไฟล์...</div><div class=ar><button class=b onclick="$('#m2').innerHTML=''">ปิด</button></div></div></div>`;
+            
+            const h = [];
+            for (const f of s.f || []) {
+                const { data } = await sb.storage.from(BK).createSignedUrl(f.id, 3600);
+                if (data?.signedUrl) {
+                    const url = data.signedUrl;
+                    if ((f.type || '').startsWith('image/')) {
+                        h.push(`<div style="margin:10px 0"><a href="${url}" target="_blank"><img src="${url}" style="max-width:100%;border-radius:10px;border:1px solid var(--l)"></a><br><small>${esc(f.name)}</small></div>`);
+                    } else {
+                        h.push(`<p>📎 <a href="${url}" target="_blank" download="${esc(f.name)}">${esc(f.name)}</a></p>`);
+                    }
+                } else {
+                    h.push(`<p class=mu>ไม่พบไฟล์ ${esc(f.name)}</p>`);
+                }
+            }
+            $('#fl').innerHTML = h.join('') || '<p class=mu>ไม่มีไฟล์แนบ</p>';
+        }
+ 
+        function subf(id) {
+            const t = D.tasks.find(x => x.id == id), s = t.s[me.id] || {};
+            modal('ส่งงาน: ' + esc(t.t), fld('ข้อความ/หมายเหตุ', 'f1', s.n, 'area') + fld('แนบลิงก์งาน (Google Drive, Canva ฯลฯ)', 'flink', s.link || '') + `<label class=fl>แนบรูปหรือไฟล์ (ไม่เกิน 10MB ต่อไฟล์)<input type=file id=ff multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip"></label>${(s.f || []).length ? `<p class=mu>ไฟล์เดิม: ${s.f.map(f => esc(f.name)).join(', ')} (เลือกไฟล์ใหม่จะแทนที่)</p>` : ''}`, `subs('${id}')`);
+        }
+ 
+        async function subs(id) {
+            const t = D.tasks.find(x => x.id == id), fs = [...$('#ff').files], old = (t.s[me.id] || {}).f || [], n = g('f1').trim(), link = g('flink').trim();
+            if (fs.some(f => f.size > 10485760)) return toast('ไฟล์ใหญ่เกิน 10MB');
+            if (!n && !link && !fs.length && !old.length) return toast('กรุณาพิมพ์ข้อความ แนบลิงก์ หรือแนบไฟล์');
+            let f = old;
+            if (fs.length) {
+                try {
+                    f = [];
+                    for (const x of fs) {
+                        const k = uid();
+                        await fput(k, x);
+                        f.push({ id: k, name: x.name, type: x.type || 'application/octet-stream' });
+                    }
+                    old.forEach(o => fdel(o.id));
+                } catch (e) { return toast('อัปโหลดไฟล์ไม่สำเร็จ: ' + (e.message || e)); }
+            }
+            t.s[me.id] = { t: today(), g: null, n, link, f };
+            save();
+            cm();
+            R();
+            toast('ส่งงานเรียบร้อย');
+        }
+ 
+        function unsub(id) {
+            if (!confirm('ยกเลิกการส่งงาน?')) return;
+            const t = D.tasks.find(x => x.id == id);
+            ((t.s[me.id] || {}).f || []).forEach(f => fdel(f.id));
+            delete t.s[me.id];
+            save();
+            R();
+        }
+ 
+        function exr(id, u) {
+            if (!confirm('ลบผลสอบของนักเรียนคนนี้เพื่อให้สอบใหม่?')) return;
+            delete D.tasks.find(x => x.id == id).s[u];
+            save();
+            tg(id);
+            R();
+        }
+ 
+        const cSel = (cs, k) => { sel[k] = cs.find(c => c.id == sel[k]) ? sel[k] : cs[0].id; return `<label class=fl>ห้องเรียน<select onchange="sel.${k}=this.value;R()">${cs.map(x => `<option value=${x.id} ${x.id == sel[k] ? 'selected' : ''}>${esc(x.name + ' ' + x.sub)}</option>`).join('')}</select></label>`; },
+              tbl = r => `<div class=tw><table>${r.map((x, i) => '<tr>' + x.map(y => i ? `<td>${esc(y)}</td>` : `<th>${esc(y)}</th>`).join('') + '</tr>').join('')}</table></div>`;
+ 
+        function grades() {
+            const cs = MC();
+            if (!isT()) {
+                const rows = cs.map(c => {
+                    const r = calc(c.id, me.id);
+                    return `<tr><td>${esc(c.sub)}</td><td>${r.m ? r.p.toFixed(1) : '-'}</td><td><b>${gst(c, me.id).lab}</b></td><td>${rk(c).find(y => y.u == me.id).k}/${c.m.length}</td></tr>`;
+                }).join('');
+                return head('ผลการเรียน', cs.length ? '<button class=b onclick="prev(tr(me.id))">🖨️ พิมพ์ใบเกรด</button> <button class="b g" onclick="myQR()">📱 QR ของฉัน</button>' : '') + `<div class="card tw">${cs.length ? `<table><tr><th>รายวิชา</th><th>คะแนนเฉลี่ย (%)</th><th>เกรด</th><th>ลำดับในห้อง</th></tr>${rows}</table><p class=gpa>GPA รวม <b>${gpa(me.id)}</b></p>` : emp('ยังไม่ได้เข้าร่วมห้องเรียน')}</div>`;
+            }
+            if (!cs.length) return head('ผลการเรียน') + emp('ยังไม่มีห้องเรียน');
+            const s = cSel(cs, 'gc');
+            return head('ผลการเรียน') + `<div class=card>${s}${tbl(brow(cs.find(c => c.id == sel.gc), { s: 1, a: 1, g: 1 }))}</div>`;
+        }
+ 
+        function rk(c) {
+            const l = c.m.map(u => ({ u, r: calc(c.id, u) })).sort((a, b) => (b.r.p ?? -1) - (a.r.p ?? -1) || nm(a.u).localeCompare(nm(b.u), 'th'));
+            l.forEach(x => x.k = x.r.p == null ? '-' : 1 + l.filter(y => y.r.p != null && y.r.p > x.r.p).length);
+            return l;
+        }
+ 
+        function brow(c, o) {
+            const h = ['ลำดับ', 'ชื่อ-นามสกุล'];
+            if (o.s) h.push('คะแนนรวม', 'คะแนนเต็ม');
+            if (o.a) h.push('เฉลี่ย (%)');
+            if (o.g) h.push('เกรด', 'GPA');
+            return [h, ...rk(c).map(x => {
+                const r = x.r, w = [x.k, nm(x.u)];
+                if (o.s) w.push(r.a, r.m);
+                if (o.a) w.push(r.p == null ? '-' : r.p.toFixed(1));
+                if (o.g) w.push(gst(c, x.u).lab, r.gp == null ? '-' : r.gp.toFixed(2));
+                return w;
+            })];
+        }
+ 
+        function tr(u) {
+            const x = gu(u) || { name: '?' }, cs = MC().filter(c => c.m.includes(u)), gp = [];
+            let a = '', d = '';
+            cs.forEach((c, i) => {
+                const r = calc(c.id, u), k = rk(c).find(y => y.u == u).k;
+                if (r.gp != null) gp.push(r.gp);
+                a += `<tr><td>${i + 1}</td><td class=l>${esc(c.sub)}<br><small>${esc(c.name)}</small></td><td class=l>${esc((gu(c.o) || {}).name || '-')}</td><td>${r.a}</td><td>${r.m}</td><td>${r.p == null ? '-' : r.p.toFixed(1)}</td><td><b>${gst(c, u).lab}</b></td><td>${k}/${c.m.length}</td></tr>`;
+                d += `<h4>${i + 1}. ${esc(c.sub)} (${esc(c.name)}) — คะแนนที่ได้ ${r.a}/${r.m} เกรด ${gst(c, u).lab} ลำดับที่ ${k}/${c.m.length}</h4><table><tr><th>รายการ</th><th>ประเภท</th><th>คะแนนที่ได้</th><th>คะแนนเต็ม</th></tr>${D.tasks.filter(t => t.c == c.id).map(t => { const s = t.s[u], ok = s && s.g != null && !s.run; return `<tr><td class=l>${esc(t.t)}</td><td>${TY[t.y]}</td><td>${ok ? s.g : '-'}</td><td>${t.max}</td></tr>`; }).join('') || '<tr><td colspan=4>ยังไม่มีรายการ</td></tr>'}</table>`;
+            });
+            return `<div class=tr><div class=trh><div class=trl><b style="font-size:17px">${esc(x.name)}</b><br>ชั้นเรียน: ${esc([...new Set(cs.map(c => c.name))].join(', ') || '-')}<br>ชื่อผู้ใช้: ${esc(x.u || '-')}<br>วันที่ออกเอกสาร: ${fd(today())}</div><div class=trc><h1>ใบรายงานผลการเรียน</h1><p>Student Grade Report</p></div><div class=trp>${x.ph ? `<img src="${x.ph}">` : 'ติดรูปถ่าย'}</div></div><h3 style="text-align:center;margin:12px 0 0">สรุปผลการเรียนรายวิชา</h3><table><tr><th>ที่</th><th>รายวิชา</th><th>ครูผู้สอน</th><th>คะแนนที่ได้</th><th>คะแนนเต็ม</th><th>ร้อยละ</th><th>เกรด</th><th>ลำดับในห้อง</th></tr>${a || '<tr><td colspan=8>ยังไม่มีรายวิชา</td></tr>'}</table><p style="text-align:right"><b>เกรดเฉลี่ย (GPA): ${gp.length ? (gp.reduce((p, q) => p + q) / gp.length).toFixed(2) : '-'}</b></p><h3 style="margin-top:10px">รายละเอียดคะแนนแต่ละรายวิชา</h3>${d}<div class=sg><div>.................................<br>ครูผู้สอน</div><div>.................................<br>ผู้ดูแลระบบ</div></div></div>`;
+        }
+ 
+        const pp = () => { document.body.classList.add('pp'); window.onafterprint = () => document.body.classList.remove('pp'); window.print(); };
+        
+        function prev(h) {
+            $('#pr').innerHTML = h;
+            $('#m').innerHTML = `<div class=mo onclick="if(event.target==this)cm()"><div class=md style="width:min(900px,100%)"><div class=ar style="margin:0 0 10px"><button class="b g" onclick=cm()>ปิด</button><button class=b onclick=pp()>🖨️ พิมพ์ / บันทึกเป็น PDF</button></div>${h}</div></div>`;
+        }
+ 
+        function xp() {
+            const cs = MC();
+            if (!cs.length) return head('ส่งออกใบเกรด') + emp('ยังไม่มีห้องเรียน');
+            const s = cSel(cs, 'xc'), c = cs.find(x => x.id == sel.xc);
+            return head('ส่งออกใบเกรด') + `<div class=card style="max-width:580px">${s}<p class=mu>ประเภทเอกสาร</p><label><input type=radio name=xm value=t checked> ใบรายงานผลการเรียนรายบุคคล (มีรูปนักเรียน)</label><br><label><input type=radio name=xm value=r> ตารางลำดับคะแนนของห้อง (1 → สุดท้าย)</label><label class=fl style="margin-top:10px">นักเรียน (สำหรับใบรายบุคคล)<select id=xs><option value="">ทั้งห้อง</option>${c.m.map(u => `<option value=${u}>${esc(nm(u))}</option>`).join('')}</select></label><p class=mu>รูปแบบไฟล์ (สำหรับตารางลำดับ)</p><label><input type=radio name=fm value=pdf checked> PDF</label> &nbsp; <label><input type=radio name=fm value=csv> Excel (CSV)</label><button class=b style="width:100%;margin-top:14px" onclick=xdo()>ส่งออก</button></div>`;
+        }
+ 
+        function xdo() {
+            const c = D.classes.find(x => x.id == sel.xc), m = document.querySelector('[name=xm]:checked').value, f = document.querySelector('[name=fm]:checked').value;
+            if (m == 't') {
+                const u = g('xs'), l = u ? [u] : c.m;
+                if (!l.length) return toast('ห้องนี้ยังไม่มีนักเรียน');
+                prev(l.map(x => tr(x)).join(''));
+            } else ex(brow(c, { s: 1, a: 1, g: 1 }), 'ลำดับคะแนน ' + c.name + ' ' + c.sub, f);
+        }
+ 
+        function rrows() {
+            return [['ห้องเรียน', 'วิชา', 'นักเรียน', 'งาน/กิจกรรม', 'เข้าเรียน (%)', 'คะแนนเฉลี่ย (%)'], ...MC().map(c => {
+                let a = 0, t = 0;
+                Object.entries(D.att).forEach(([k, v]) => { if (k.split('|')[0] == c.id) Object.values(v).forEach(x => { t++; if (x != 'ข' && x != 'ล') a++; }); });
+                const ps = c.m.map(u => calc(c.id, u).p).filter(p => p != null);
+                return [c.name, c.sub, c.m.length, D.tasks.filter(x => x.c == c.id).length, t ? (a / t * 100).toFixed(1) : '-', ps.length ? (ps.reduce((x, y) => x + y) / ps.length).toFixed(1) : '-'];
+            })];
+        }
+ 
+        const report = () => head('รายงาน', `<button class="b g" onclick="csv(rrows(),'รายงานห้องเรียน')">Excel</button> <button class=b onclick="pr('รายงานภาพรวมห้องเรียน',rrows())">PDF</button>`) + `<div class=card>${rrows().length > 1 ? tbl(rrows()) : emp('ยังไม่มีข้อมูล')}</div>`;
+ 
+        function nts() {
+            const ids = MC().map(c => c.id), l = D.notes.filter(n => (!n.to || n.to == me.id || n.o == me.id || me.role == 'admin') && (me.role == 'admin' || n.o == me.id || !n.c || ids.includes(n.c))).map(n => ({ ...n, t: n.t + (n.b ? ' — ' + n.b : ''), d: n.d }));
+            if (!isT()) D.tasks.filter(t => ids.includes(t.c) && !t.s[me.id] && t.d).forEach(t => {
+                const dd = (new Date(t.d + 'T00:00') - new Date(today() + 'T00:00')) / 864e5;
+                if (dd <= 3) l.push({ id: t.id, t: `${dd < 0 ? 'เลยกำหนด' : 'ใกล้กำหนด'}: ${t.t} (${cn(t.c)}) ${fd(t.d)}`, d: t.d, a: 1 });
+            });
+            return l.sort((a, b) => (b.d || '').localeCompare(a.d || ''));
+        }
+ 
+        function notes() {
+            const l = nts();
+            return head('แจ้งเตือน', isT() ? '<button class=b onclick=nf()>+ ประกาศ</button>' : '') + `<div class=card>${l.map(n => `<div class=li><div>${n.a ? '⏰' : '📢'} ${esc(n.t)}<br><small class=mu>${fd(n.d)}</small></div>${isT() && !n.a ? `<button class="b s d" onclick="ndel('${n.id}')">ลบ</button>` : ''}</div>`).join('') || emp('ไม่มีแจ้งเตือน')}</div>`;
+        }
+ 
+        const nf = () => modal('สร้างประกาศ', fld('ห้องเรียน', 'f1', '', 'select', [['', 'ทุกห้อง'], ...MC().map(c => [c.id, c.name + ' ' + c.sub])]) + fld('หัวข้อ', 'f2') + fld('รายละเอียด', 'f3', '', 'area'), 'nsv()');
+        
+        function nsv() {
+            const t = g('f2').trim();
+            if (!t) return toast('กรอกหัวข้อ');
+            D.notes.push({ id: uid(), t, b: g('f3'), c: g('f1'), o: me.id, d: today() });
+            save();
+            cm();
+            R();
+        }
+ 
+        const ndel = id => { D.notes = D.notes.filter(n => n.id != id); save(); R(); };
+ 
+        const codesCard = () => `<div class=card><div class=hd style="margin:0 0 8px"><h3 style="margin:0">รหัสสมัครครู</h3><button class="b s" onclick=ncode()>+ สร้างรหัสใหม่</button></div><p class=mu>ครูต้องกรอกรหัสนี้ตอนสมัคร (ใช้ได้ครั้งเดียว) เพื่อป้องกันผู้อื่นสมัครเป็นครู</p>${D.codes.map(c => `<div class=li><span><code>${c.c}</code>${c.u ? 'ใช้แล้วโดย ' + esc(c.u) : '<span class="tg ม">ยังไม่ถูกใช้</span>'}</span><button class="b s d" onclick="dcode('${c.c}')">ลบ</button></div>`).join('') || '<p class=mu>ยังไม่มีรหัส</p>'}</div>`;
+        
+        const ncode = () => { D.codes.push({ c: Math.random().toString(36).slice(2, 10).toUpperCase().padEnd(8, 'X'), u: '' }); save(); R(); },
+              dcode = k => { D.codes = D.codes.filter(c => c.c != k); save(); R(); };
+ 
+        const upw = async id => {
+                  const p = prompt('ตั้งรหัสผ่านใหม่ (อย่างน้อย 3 ตัว)');
+                  if (!p || p.length < 3) return;
+                  const { error } = await sb.rpc('admin_set_password', { target: id, pw: px(p) });
+                  toast(error ? error.message : 'เปลี่ยนรหัสผ่านแล้ว');
+              },
+              udel = async id => {
+                  if (!confirm('ลบผู้ใช้นี้?')) return;
+                  const { error } = await sb.rpc('admin_delete_user', { target: id });
+                  if (error) return toast(error.message);
+                  D.users = D.users.filter(u => u.id != id);
+                  D.classes.forEach(c => c.m = c.m.filter(x => x != id));
+                  await save();
+                  R();
+              };
+ 
+        function set() {
+            return head('ตั้งค่า') + `<div class=card style="max-width:560px">${me.role != 'admin' ? `<div class=ar style="justify-content:flex-start"><div class=av style="width:70px;height:70px;font-size:28px;border:2px solid var(--p);${me.ph ? `background:url(${me.ph}) center/cover` : ''}">${me.ph ? '' : '👤'}</div><label class="b g">📷 อัปโหลดรูปโปรไฟล์<input type=file accept=image/* hidden onchange="setPh('${me.id}',this)"></label></div>` + fld('ชื่อ-นามสกุล', 'f1', me.name) + `<button class=b onclick=sname()>บันทึกชื่อ</button><hr style="margin:16px 0;border:0;border-top:1px solid var(--l)">` : ''}<h3>เปลี่ยนรหัสผ่าน</h3>${fld('รหัสผ่านใหม่', 'f2', '', 'password')}<button class=b onclick=spw()>เปลี่ยนรหัสผ่าน</button><hr style="margin:16px 0;border:0;border-top:1px solid var(--l)"><label><input type=checkbox ${D.dark ? 'checked' : ''} onchange="D.dark=this.checked;save();R()"> โหมดมืด</label><hr style="margin:16px 0;border:0;border-top:1px solid var(--l)"><h3>สำรองข้อมูล</h3><div class=ar style="justify-content:flex-start"><button class="b g" onclick=bk()>ส่งออกข้อมูลสำรอง</button><label class="b g">นำเข้าข้อมูล<input type=file accept=.json hidden onchange=imp(this)></label>${me.role == 'admin' ? '<button class="b d" onclick=wipe()>ล้างข้อมูลทั้งหมด</button>' : ''}</div><hr style="margin:16px 0;border:0;border-top:1px solid var(--l)"><button class="b d" onclick=logout()>ออกจากระบบ</button></div>`;
+        }
+ 
+        const sname = () => { const n = g('f1').trim(); if (!n) return; me.name = n; save(); R(); toast('บันทึกแล้ว'); };
+        
+        const spw = async () => {
+            const p = g('f2');
+            if (p.length < 3) return toast('รหัสผ่านสั้นเกินไป');
+            const { error } = await sb.auth.updateUser({ password: px(p) });
+            toast(error ? error.message : 'เปลี่ยนรหัสผ่านแล้ว');
+        };
+ 
+        const bk = () => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(D)], { type: 'application/json' }));
+            a.download = 'classroom-backup.json';
+            a.click();
+        };
+ 
+        const imp = i => {
+            const f = i.files[0];
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = () => {
+                try {
+                    const x = JSON.parse(r.result);
+                    if (!x.users || !x.classes) throw 0;
+                    D = x;
+                    save();
+                    me = gu(me.id) || gu('admin');
+                    R();
+                    toast('นำเข้าข้อมูลสำเร็จ');
+                } catch (e) { toast('ไฟล์ไม่ถูกต้อง'); }
+            };
+            r.readAsText(f);
+        };
+ 
+        const wipe = () => {
+            if (confirm('ลบข้อมูลทั้งหมดถาวร?')) {
+                D = { users: D.users, classes: [], att: {}, tasks: [], notes: [], codes: D.codes || [], attOpen: {} };
+                save();
+                R();
+            }
+        };
+ 
+        /* ================= v2: ประวัติคะแนน · วงล้อหรรษา · เช็คชื่อแก้ไขได้ ================= */
+const CATS = { col: 'คะแนนเก็บ', mid: 'กลางภาค', fin: 'ปลายภาค', oth: 'อื่น ๆ' }, CK = Object.keys(CATS);
+const cat = t => t.y == 'ex' ? ({ m: 'mid', f: 'fin' }[t.k] || 'col') : (t.cat || 'col');
+const rno = (c, u) => (c.no || {})[u] || '';
+const ms = c => [...c.m].sort((a, b) => (+rno(c, a) || 9999) - (+rno(c, b) || 9999) || nm(a).localeCompare(nm(b), 'th'));
+const lbl = (c, u) => (rno(c, u) ? rno(c, u) + '. ' : '') + nm(u);
+const cw = c => c && c.w && Object.values(c.w).some(v => +v > 0) ? c.w : null;
+function tst(t, u) {
+    const s = t.s[u];
+    if (s && s.run) return 'run';
+    if (s && s.g != null) return 'ok';
+    if (s && !t.man) return 'wait';
+    if (t.man) return 'todo';
+    if (t.y == 'ex') return t.done && !t.open ? 'miss' : 'todo';
+    return t.d && t.d < today() ? 'miss' : 'todo';
+}
+function catSum(c, u, k) { let a = 0, m = 0; D.tasks.forEach(t => { if (t.c == c.id && cat(t) == k) { const s = t.s[u]; if (s && s.g != null && !s.run) { a += +s.g; m += +t.max; } } }); return { a, m }; }
+function gst(c, u) {
+    const r = calc(c.id, u), ts = D.tasks.filter(t => t.c == c.id), mi = ts.filter(t => tst(t, u) == 'miss'), wt = ts.filter(t => tst(t, u) == 'wait').length;
+    const f = mi.length ? 'ร' : (r.p != null && r.p < 50 ? '0' : '');
+    return { ...r, mi, wt, f, lab: f == 'ร' ? 'ร' : r.l };
+}
+const ftag = x => x.f == 'ร' ? `<span class="tg r">ติด ร (ขาด ${x.mi.length})</span>` : x.f == '0' ? '<span class="tg z">ติด 0</span>' : x.p == null ? '<span class="tg">-</span>' : '<span class="tg ม">ผ่าน</span>';
+function gcell(t, u, ed) {
+    const s = t.s[u], k = tst(t, u), tx = { ok: s && s.g != null ? s.g : '-', wait: 'รอตรวจ', miss: 'ขาดส่ง', todo: t.man ? '-' : 'ยังไม่ส่ง', run: 'กำลังสอบ' }[k];
+    return `<span class="cell c-${k}" ${ed ? `onclick="se('${t.id}','${u}')"` : ''}>${tx}</span>`;
+}
+function cpick(cs, k) {
+    sel[k] = cs.find(c => c.id == sel[k]) ? sel[k] : cs[0].id;
+    if (me.role == 'teacher' && cs.length <= 10) return `<div class=pill style="margin-bottom:10px">${cs.map(x => `<button class="${x.id == sel[k] ? 'on n' : ''}" onclick="sel.${k}='${x.id}';R()">${esc(x.sub)} · ${esc(x.name)}</button>`).join('')}</div>`;
+    return `<label class=fl>วิชา / ห้องเรียน<select onchange="sel.${k}=this.value;R()">${cs.map(x => `<option value=${x.id} ${x.id == sel[k] ? 'selected' : ''}>${esc(x.name + ' ' + x.sub)}${me.role == 'admin' ? ' — ครู' + esc(nm(x.o)) : ''}</option>`).join('')}</select></label>`;
+}
+const scTasks = (c, f) => D.tasks.filter(t => t.c == c.id && (!f || cat(t) == f)).sort((a, b) => CK.indexOf(cat(a)) - CK.indexOf(cat(b)) || (a.d || '').localeCompare(b.d || ''));
+ 
+function scores() { return isT() ? scT() : scS(); }
+function scT() {
+    const cs = MC();
+    if (!cs.length) return head('ประวัติการบันทึกคะแนน') + emp('ยังไม่มีห้องเรียน');
+    const pk = cpick(cs, 'sc'), c = cs.find(x => x.id == sel.sc); sel.sv = sel.sv || 'm';
+    const tabs = [['m', '📋 ตารางคะแนน'], ['x', '⚠️ ติดตามงานค้าง'], ['s', '📊 สรุป / สัดส่วนคะแนน']];
+    return head('ประวัติการบันทึกคะแนน', `<button class="b g" onclick="scx('csv')">Excel</button> <button class="b g" onclick="scx()">PDF</button>`)
+        + `<div class=card>${pk}<div class=pill>${tabs.map(t => `<button class="${sel.sv == t[0] ? 'on n' : ''}" onclick="sel.sv='${t[0]}';R()">${t[1]}</button>`).join('')}</div></div>`
+        + (sel.sv == 'x' ? scX(c) : sel.sv == 's' ? scSum(c) : scM(c));
+}
+function scM(c) {
+    const f = sel.sf || '', q = (sel.sq || '').trim().toLowerCase(), tk = scTasks(c, f), grp = CK.map(k => ({ k, t: tk.filter(t => cat(t) == k) })).filter(x => x.t.length);
+    const st = ms(c).filter(u => !q || nm(u).toLowerCase().includes(q) || String(rno(c, u)) == q), all = grp.flatMap(x => x.t);
+    const ctl = `<div class=card><div class=r4><label class=fl>หมวดคะแนน<select onchange="sel.sf=this.value;R()"><option value="">ทั้งหมด</option>${CK.map(k => `<option value=${k} ${f == k ? 'selected' : ''}>${CATS[k]}</option>`).join('')}</select></label><label class=fl>ค้นหาชื่อ / เลขที่<input value="${esc(sel.sq || '')}" onchange="sel.sq=this.value;R()"></label></div><div class=pill style="margin-top:8px"><span class=mu style="align-self:center">เพิ่มหัวข้อคะแนน:</span>${CK.map(k => `<button onclick="sel.nc='${k}';tf('act')">+ ${CATS[k]}</button>`).join('')}<button onclick="tf('ex')">+ ข้อสอบออนไลน์</button><button onclick="mem('${c.id}')">👥 เลขที่ / นักเรียน</button></div><p class=mu style="margin-top:8px">คลิกคะแนนในช่องเพื่อแก้ไข · คลิกชื่อหัวข้อเพื่อกรอกทั้งห้อง · คลิกชื่อนักเรียนเพื่อดูรายละเอียด</p></div>`;
+    if (!c.m.length) return ctl + emp('ห้องนี้ยังไม่มีนักเรียน');
+    if (!tk.length) return ctl + emp('ยังไม่มีหัวข้อคะแนน กดปุ่ม “+ …” ด้านบนเพื่อเพิ่ม');
+    const th = `<tr><th rowspan=2 class=sticky1>เลขที่ · ชื่อ-นามสกุล</th>${grp.map(x => `<th colspan=${x.t.length}>${CATS[x.k]}</th>`).join('')}<th colspan=${CK.length}>รวมรายหมวด</th><th colspan=4>สรุป</th></tr><tr>${all.map(t => `<th style="cursor:pointer" title="${esc(t.t)}" onclick="tg('${t.id}')">${esc(t.t.length > 14 ? t.t.slice(0, 13) + '…' : t.t)}<br><small>/${t.max}</small></th>`).join('')}${CK.map(k => `<th>${CATS[k]}</th>`).join('')}<th>รวม</th><th>%</th><th>เกรด</th><th>สถานะ</th></tr>`;
+    const body = st.map(u => {
+        const x = gst(c, u);
+        return `<tr><td class=sticky1 style="text-align:left;cursor:pointer" onclick="sd('${c.id}','${u}')">${esc(lbl(c, u))}</td>${all.map(t => `<td>${gcell(t, u, 1)}</td>`).join('')}${CK.map(k => { const s = catSum(c, u, k); return `<td>${s.m ? s.a + '/' + s.m : '-'}</td>`; }).join('')}<td>${x.a}/${x.m}</td><td>${x.p == null ? '-' : x.p.toFixed(1)}</td><td><b>${x.lab}</b></td><td>${ftag(x)}</td></tr>`;
+    }).join('');
+    const span = CK.length + 4;
+    const foot = `<tr><td class=sticky1 style="text-align:left"><b>ค่าเฉลี่ย</b></td>${all.map(t => { const v = c.m.map(u => t.s[u]).filter(s => s && s.g != null && !s.run).map(s => +s.g); return `<td>${v.length ? (v.reduce((a, b) => a + b) / v.length).toFixed(1) : '-'}</td>`; }).join('')}<td colspan=${span}></td></tr><tr><td class=sticky1 style="text-align:left"><b>ส่งแล้ว</b></td>${all.map(t => `<td>${c.m.filter(u => t.s[u] && !t.s[u].run).length}/${c.m.length}</td>`).join('')}<td colspan=${span}></td></tr>`;
+    return ctl + `<div class="card tw"><table class=sc2>${th}${body}${foot}</table></div>`;
+}
+function scX(c) {
+    const st = ms(c).map(u => ({ u, x: gst(c, u) })), nr = st.filter(s => s.x.f == 'ร').length, nz = st.filter(s => s.x.f == '0').length, nw = st.reduce((a, s) => a + s.x.wt, 0);
+    const list = st.filter(s => s.x.f || s.x.wt).sort((a, b) => b.x.mi.length - a.x.mi.length);
+    return `<div class=grid>${sc(st.length - nr - nz, 'ผ่านเกณฑ์ (ปกติ)')}${sc(nr, 'ติด ร (มีงานขาดส่ง)')}${sc(nz, 'เสี่ยงติด 0 (<50%)')}${sc(nw, 'งานรอตรวจ')}</div><div class="card tw"><div class=hd style="margin:0 0 8px"><h3 style="margin:0">นักเรียนที่ต้องติดตาม</h3>${nr ? `<button class=b onclick="rem('${c.id}')">🔔 แจ้งเตือนทุกคนที่ติด ร</button>` : ''}</div>${list.length ? `<table><tr><th>นักเรียน</th><th style="text-align:left">งานที่ขาดส่ง</th><th>รอตรวจ</th><th>สถานะ</th><th></th></tr>${list.map(s => `<tr><td style="white-space:nowrap">${esc(lbl(c, s.u))}</td><td>${s.x.mi.map(t => `<span class="tg z" style="margin:2px;cursor:pointer" onclick="se('${t.id}','${s.u}')">${esc(t.t)}</span>`).join('') || '-'}</td><td>${s.x.wt || '-'}</td><td>${ftag(s.x)}</td><td class=ac>${s.x.mi.length ? `<button class="b s" onclick="rem('${c.id}','${s.u}')">🔔 ทวงงาน</button>` : ''}</td></tr>`).join('')}</table>` : emp('🎉 ไม่มีนักเรียนที่ต้องติดตาม')}</div>`;
+}
+function scSum(c) {
+    const st = ms(c).map(u => gst(c, u)), dist = {};
+    ['4', '3.5', '3', '2.5', '2', '1.5', '1', '0', 'ร', '-'].forEach(k => dist[k] = 0);
+    st.forEach(x => { dist[x.f == 'ร' ? 'ร' : x.gp == null ? '-' : String(x.gp)]++; });
+    const mx = Math.max(1, ...Object.values(dist)), ps = st.filter(x => x.p != null).map(x => x.p), av = ps.length ? ps.reduce((a, b) => a + b) / ps.length : null, w = c.w || {};
+    return `<div class=grid>${sc(c.m.length, 'นักเรียน')}${sc(av == null ? '-' : av.toFixed(1) + '%', 'คะแนนเฉลี่ยห้อง')}${sc(ps.length ? Math.max(...ps).toFixed(1) + '%' : '-', 'สูงสุด')}${sc(ps.length ? Math.min(...ps).toFixed(1) + '%' : '-', 'ต่ำสุด')}</div><div class=two><div class=card><h3>การกระจายเกรด (0 – 4)</h3>${Object.entries(dist).map(([k, v]) => `<div class=li style="gap:8px"><b style="width:64px">${k == 'ร' ? 'ร' : k == '-' ? 'ยังไม่มี' : 'เกรด ' + k}</b><div class=bar style="flex:1;margin:0"><i style="width:${v / mx * 100}%"></i></div><span>${v}</span></div>`).join('')}</div><div class=card><h3>สัดส่วนคะแนนรายหมวด (%)</h3><p class=mu>เว้นว่าง = รวมคะแนนดิบทุกหมวด · ใส่สัดส่วน เช่น 70 / 30 ระบบจะถ่วงน้ำหนักเฉพาะหมวดที่มีคะแนนแล้ว</p><div class=r2>${CK.map(k => `<label class=fl>${CATS[k]}<input type=number min=0 max=100 id=w_${k} value="${w[k] || ''}" placeholder="-"></label>`).join('')}</div><div class=ar><button class="b g" onclick="wsv(1)">ล้าง</button><button class=b onclick="wsv()">บันทึกสัดส่วน</button></div><hr style="margin:12px 0;border:0;border-top:1px solid var(--l)"><p class=mu><b>เกณฑ์เกรดไทย:</b> 80=4 · 75=3.5 · 70=3 · 65=2.5 · 60=2 · 55=1.5 · 50=1 · ต่ำกว่า 50 = 0<br><b>ร</b> = มีงานเลยกำหนดแต่ยังไม่ส่ง (รอการตัดสิน) · <b>ติด 0</b> = ส่งครบแล้วแต่ต่ำกว่า 50%</p></div></div>`;
+}
+function wsv(clear) {
+    const c = D.classes.find(x => x.id == sel.sc);
+    if (clear) delete c.w; else { c.w = {}; CK.forEach(k => { const v = +g('w_' + k); if (v > 0) c.w[k] = v; }); }
+    save(); R(); toast('บันทึกสัดส่วนคะแนนแล้ว');
+}
+function scRows(c) {
+    const tk = scTasks(c, '');
+    return [['เลขที่', 'ชื่อ-นามสกุล', ...tk.map(t => `${t.t} [${CATS[cat(t)]}] /${t.max}`), ...CK.map(k => 'รวม' + CATS[k]), 'รวม', 'เต็ม', 'ร้อยละ', 'เกรด', 'สถานะ'],
+        ...ms(c).map(u => { const x = gst(c, u); return [rno(c, u), nm(u), ...tk.map(t => { const k = tst(t, u), s = t.s[u]; return k == 'ok' ? s.g : { wait: 'รอตรวจ', miss: 'ขาดส่ง', todo: '-', run: 'กำลังสอบ' }[k]; }), ...CK.map(k => { const s = catSum(c, u, k); return s.m ? s.a : '-'; }), x.a, x.m, x.p == null ? '-' : x.p.toFixed(1), x.lab, x.f == 'ร' ? 'ติด ร' : x.f == '0' ? 'ติด 0' : 'ปกติ']; })];
+}
+const scx = f => { const c = D.classes.find(x => x.id == sel.sc); ex(scRows(c), 'ประวัติคะแนน_' + c.name + '_' + c.sub, f); };
+function se(tid, u) {
+    const t = D.tasks.find(x => x.id == tid), s = t.s[u] || {}, k = tst(t, u);
+    modal(esc(t.t) + ' — ' + esc(nm(u)), `<p class=mu>หมวด ${CATS[cat(t)]} · คะแนนเต็ม ${t.max} · สถานะ: ${{ ok: 'ตรวจแล้ว', wait: 'ส่งแล้ว รอตรวจ', miss: 'ขาดส่ง (เลยกำหนด)', todo: 'ยังไม่ส่ง', run: 'กำลังสอบ' }[k]}</p>` + fld('คะแนนที่ได้ (เว้นว่างได้)', 'f1', s.g ?? '', 'number') + `<label class=fl>การส่งงาน<select id=f2><option value=0 ${!t.s[u] ? 'selected' : ''}>ยังไม่ส่ง / ไม่มีคะแนน</option><option value=1 ${t.s[u] ? 'selected' : ''}>ส่งแล้ว / มีคะแนน</option></select></label>` + ((s.n || (s.f || []).length) ? `<button class="b s g" onclick="vw('${tid}','${u}')">ดูงานที่ส่ง</button>` : ''), `ses('${tid}','${u}')`);
+}
+function ses(tid, u) {
+    const t = D.tasks.find(x => x.id == tid), v = g('f1'), old = t.s[u];
+    if (v !== '' && isNaN(+v)) return toast('กรอกคะแนนเป็นตัวเลข');
+    if (v !== '') { const n = { ...(old || {}), t: (old || {}).t || today(), g: Math.max(0, Math.min(+v, t.max)) }; delete n.run; t.s[u] = n; }
+    else if (g('f2') == '1') { const n = { ...(old || {}), t: (old || {}).t || today(), g: null }; delete n.run; t.s[u] = n; }
+    else { if (old && old.f) old.f.forEach(f => fdel(f.id)); delete t.s[u]; }
+    save(); cm(); R(); toast('บันทึกคะแนนแล้ว');
+}
+function sd(cid, u) {
+    const c = D.classes.find(x => x.id == cid), x = gst(c, u), a = { ม: 0, ส: 0, ข: 0, ล: 0 };
+    Object.entries(D.att).forEach(([k, v]) => { if (k.split('|')[0] == cid && v[u]) a[v[u]]++; });
+    modal(esc(lbl(c, u)), `<div class=pill style="margin-bottom:8px">${ftag(x)}<span class=tg>${x.p == null ? '-' : x.p.toFixed(1) + '%'} · เกรด ${x.lab}</span><span class=tg>มา ${a.ม} · สาย ${a.ส} · ขาด ${a.ข} · ลา ${a.ล}</span></div>` + (D.tasks.filter(t => t.c == cid).map(t => `<div class=li><span>${esc(t.t)}<br><small class=mu>${CATS[cat(t)]}</small></span><span>${gcell(t, u, 0)} <small>/${t.max}</small></span></div>`).join('') || emp('ยังไม่มีหัวข้อคะแนน')) + `<div class=ar><button class="b g" onclick="cm();prev(tr('${u}'))">🖨️ ใบเกรด</button>${x.mi.length ? `<button class=b onclick="rem('${cid}','${u}');cm()">🔔 ทวงงาน</button>` : ''}</div>`);
+}
+function rem(cid, u) {
+    const c = D.classes.find(x => x.id == cid), l = u ? [u] : c.m; let n = 0;
+    l.forEach(x => {
+        const r = gst(c, x); if (!r.mi.length) return;
+        if (D.notes.some(z => z.to == x && z.c == cid && z.d == today() && z.k == 'rem')) return;
+        D.notes.push({ id: uid(), t: '⏰ งานค้างส่ง: ' + c.sub, b: 'ขาดส่ง: ' + r.mi.map(t => t.t).join(', ') + ' — กรุณาส่งโดยเร็วเพื่อไม่ให้ติด ร', c: cid, o: me.id, d: today(), to: x, k: 'rem' }); n++;
+    });
+    save(); R(); toast(n ? `ส่งแจ้งเตือนแล้ว ${n} คน` : 'ไม่มีรายการที่ต้องแจ้ง (หรือแจ้งไปแล้ววันนี้)');
+}
+function scS() {
+    const cs = MC(), t0 = today(), urg = [], pg = t => ({ hw: 'hw', act: 'act', ex: 'exam' }[t.y]);
+    cs.forEach(c => D.tasks.filter(t => t.c == c.id && !t.man).forEach(t => { const k = tst(t, me.id); if (k == 'miss' || (k == 'todo' && t.d && (new Date(t.d + 'T00:00') - new Date(t0 + 'T00:00')) / 864e5 <= 7)) urg.push({ c, t, k }); }));
+    urg.sort((a, b) => (a.k == 'miss' ? 0 : 1) - (b.k == 'miss' ? 0 : 1) || (a.t.d || '').localeCompare(b.t.d || ''));
+    return head('ประวัติคะแนนของฉัน', cs.length ? '<button class=b onclick="prev(tr(me.id))">🖨️ พิมพ์ใบเกรด</button> <button class="b g" onclick="myQR()">📱 QR ของฉัน</button>' : '')
+        + (cs.length ? `<div class=grid>${sc(gpa(me.id), 'GPA รวม')}${sc(urg.filter(x => x.k == 'miss').length, 'งานขาดส่ง (เสี่ยงติด ร)')}${sc(cs.filter(c => gst(c, me.id).f == '0').length, 'วิชาเสี่ยงติด 0')}</div>` : '')
+        + (urg.length ? `<div class=card style="border-left:4px solid #ef4444"><h3>⚠️ งานที่ต้องรีบส่ง</h3>${urg.map(x => `<div class=li><div><b>${esc(x.t.t)}</b><br><small class=mu>${esc(x.c.sub)} · กำหนด ${fd(x.t.d)}</small></div><span><span class="tg ${x.k == 'miss' ? 'z' : 'r'}">${x.k == 'miss' ? 'เลยกำหนด' : 'ใกล้กำหนด'}</span> <button class="b s" onclick="go('${pg(x.t)}')">ไปส่งงาน</button></span></div>`).join('')}</div>` : '')
+        + (cs.map(c => { const x = gst(c, me.id), tk = scTasks(c, ''); return `<div class=card><div class=hd style="margin:0 0 8px"><h3 style="margin:0">${esc(c.sub)} <small class=mu>${esc(c.name)} · ครู${esc(nm(c.o))}</small></h3><div>${ftag(x)} <span class=tg>${x.p == null ? '-' : x.p.toFixed(1) + '%'} · เกรด ${x.lab}</span></div></div>${tk.length ? `<div class=tw><table><tr><th style="text-align:left">รายการ</th><th>หมวด</th><th>กำหนด</th><th>คะแนน</th></tr>${tk.map(t => `<tr><td>${esc(t.t)}</td><td>${CATS[cat(t)]}</td><td>${t.y == 'ex' ? '-' : fd(t.d)}</td><td>${gcell(t, me.id, 0)} <small>/${t.max}</small></td></tr>`).join('')}</table></div>` : emp('ยังไม่มีหัวข้อคะแนน')}</div>`; }).join('') || emp('ยังไม่ได้เข้าร่วมห้องเรียน'));
+}
+ 
+const AT = {}, ASTS = [['ม', 'มา'], ['ส', 'สาย'], ['ข', 'ขาด'], ['ล', 'ลา']];
+const atSave = () => { clearTimeout(AT.t); AT.t = setTimeout(() => { AT.t = 0; save(); }, 500); };
+function tAtt() {
+    const cs = MC();
+    if (!cs.length) return head('เช็คเวลาเรียน') + emp('ยังไม่มีห้องเรียน');
+    sel.ad = sel.ad || today(); const pk = cpick(cs, 'ac');
+    return head('เช็คชื่อ — ครูแก้ไขได้ทุกวัน') + `<div class=card>${pk}<div class=r3><label class=fl>วันที่<div class=ar style="margin:4px 0 0;justify-content:flex-start;flex-wrap:nowrap"><button class="b s g" onclick="adx(-1)">◀</button><input type=date value=${sel.ad} onchange="sel.ad=this.value||today();R()"><button class="b s g" onclick="adx(1)">▶</button><button class="b s g" onclick="sel.ad=today();R()">วันนี้</button></div></label><label class=fl>ค้นหา<input placeholder="ชื่อ หรือ เลขที่" value="${esc(sel.aq || '')}" oninput="sel.aq=this.value;atr()"></label></div><div id=attb>${atT()}</div></div>`;
+}
+const adx = n => { const d = new Date(sel.ad + 'T00:00'); d.setDate(d.getDate() + n); sel.ad = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); R(); };
+const atr = () => { const e = $('#attb'); if (e) e.innerHTML = atT(); };
+function atT() {
+    const c = MC().find(x => x.id == sel.ac); if (!c) return '';
+    if (!c.m.length) return emp('ห้องนี้ยังไม่มีนักเรียน');
+    const a = D.att[c.id + '|' + sel.ad] || {}, q = (sel.aq || '').trim().toLowerCase(), cnt = { ม: 0, ส: 0, ข: 0, ล: 0 };
+    c.m.forEach(u => { if (a[u]) cnt[a[u]]++; });
+    const un = c.m.length - cnt.ม - cnt.ส - cnt.ข - cnt.ล, rows = ms(c).filter(u => !q || nm(u).toLowerCase().includes(q) || String(rno(c, u)) == q);
+    return `<div class=pill style="margin:10px 0">${ASTS.map(s => `<span class="tg ${s[0]}">${s[1]} ${cnt[s[0]]}</span>`).join('')}<span class=tg>ยังไม่เช็ค ${un}</span></div><div class=tw><table><tr><th>เลขที่</th><th style="text-align:left">ชื่อ-นามสกุล</th><th style="text-align:left">สถานะ (คลิกเพื่อแก้ไข)</th></tr>${rows.map(u => `<tr><td>${rno(c, u) || '-'}</td><td>${esc(nm(u))}</td><td><div class=pill>${ASTS.map(s => `<button class="${a[u] == s[0] ? 'on ' + s[0] : ''}" onclick="atSet('${u}','${s[0]}')">${s[1]}</button>`).join('')}<button onclick="atSet('${u}','-')" title="ล้าง">✕</button></div></td></tr>`).join('')}</table></div><div class=ar><span class=mu>✓ บันทึกอัตโนมัติทุกครั้งที่แก้ไข</span><button class="b g s" onclick="atAll('ม')">ทุกคนมา</button><button class="b g s" onclick="atAll('ข')">ทุกคนขาด</button><button class="b g s" onclick="atAll('-')">ล้างวันนี้</button><button class="b g s" onclick="aex('csv')">Excel</button><button class="b g s" onclick="aex()">PDF</button></div>`;
+}
+function atSet(u, v) { const k = sel.ac + '|' + sel.ad; D.att[k] = D.att[k] || {}; if (v == '-') delete D.att[k][u]; else D.att[k][u] = v; if (!Object.keys(D.att[k]).length) delete D.att[k]; atr(); atSave(); }
+function atAll(v) {
+    const c = MC().find(x => x.id == sel.ac), k = c.id + '|' + sel.ad;
+    if (v == '-' && !confirm('ล้างข้อมูลเช็คชื่อของวันนี้ทั้งหมด?')) return;
+    D.att[k] = D.att[k] || {}; c.m.forEach(u => { if (v == '-') delete D.att[k][u]; else D.att[k][u] = v; });
+    if (!Object.keys(D.att[k]).length) delete D.att[k]; atr(); atSave();
+}
+function aex(f) { const c = MC().find(x => x.id == sel.ac), a = D.att[c.id + '|' + sel.ad] || {}; ex([['เลขที่', 'ชื่อ-นามสกุล', 'สถานะ'], ...ms(c).map(u => [rno(c, u), nm(u), L[a[u]] || 'ยังไม่เช็ค'])], 'เช็คชื่อ ' + c.name + ' ' + c.sub + ' ' + sel.ad, f); }
+function attHistoryView() {
+    const cs = MC();
+    if (!cs.length) return head('ประวัติเช็คชื่อ') + emp('ยังไม่มีห้องเรียน');
+    const pk = cpick(cs, 'hc'), c = cs.find(x => x.id == sel.hc), Y = new Date().getFullYear(); sel.hy = sel.hy || Y; sel.hm = sel.hm || ''; sel.hd = sel.hd || '';
+    const ds = Object.keys(D.att).filter(k => { const [cid, s] = k.split('|'); if (cid !== c.id) return false; const d = new Date(s + 'T00:00'); return d.getFullYear() == sel.hy && (!sel.hm || d.getMonth() + 1 == sel.hm) && (!sel.hd || d.getDate() == sel.hd); }).map(k => k.split('|')[1]).sort().reverse(), st = ms(c);
+    const months = [['', 'ทุกเดือน'], [1, 'มกราคม'], [2, 'กุมภาพันธ์'], [3, 'มีนาคม'], [4, 'เมษายน'], [5, 'พฤษภาคม'], [6, 'มิถุนายน'], [7, 'กรกฎาคม'], [8, 'สิงหาคม'], [9, 'กันยายน'], [10, 'ตุลาคม'], [11, 'พฤศจิกายน'], [12, 'ธันวาคม']];
+    const sm = st.map(u => { const k = { ม: 0, ส: 0, ข: 0, ล: 0 }; ds.forEach(d => { const v = (D.att[c.id + '|' + d] || {})[u]; if (v) k[v]++; }); const t = k.ม + k.ส + k.ข + k.ล; return { u, k, p: t ? (k.ม + k.ส) / t * 100 : null }; });
+    return head('ประวัติเช็คชื่อย้อนหลัง', `<button class=b onclick="sel.ac='${c.id}';sel.ad=today();go('att')">✏️ เช็คชื่อ / แก้ไขวันนี้</button>`)
+        + `<div class=card>${pk}<div class=r4><label class=fl>ปี<select onchange="sel.hy=this.value;R()">${[Y - 2, Y - 1, Y, Y + 1].map(y => `<option value="${y}" ${y == sel.hy ? 'selected' : ''}>${y + 543}</option>`).join('')}</select></label><label class=fl>เดือน<select onchange="sel.hm=this.value;R()">${months.map(m => `<option value="${m[0]}" ${m[0] == sel.hm ? 'selected' : ''}>${m[1]}</option>`).join('')}</select></label><label class=fl>วันที่<input type=number min=1 max=31 placeholder="ทุกวัน" value="${sel.hd}" onchange="sel.hd=this.value;R()"></label><label class=fl>เพิ่ม/แก้วันที่ย้อนหลัง<input type=date onchange="if(this.value){sel.ac='${c.id}';sel.ad=this.value;go('att')}"></label></div>`
+        + (ds.length ? `<p class=mu style="margin-top:10px">คลิกช่องสถานะเพื่อแก้ไขรายบุคคล · ✏️ แก้ทั้งวัน · 🗑 ลบทั้งวัน</p><div class=tw style="margin-top:6px"><table class=sc2><tr><th class=sticky1>วันที่</th>${st.map(u => `<th>${esc(lbl(c, u))}</th>`).join('')}<th></th></tr>${ds.map(dt => { const rec = D.att[c.id + '|' + dt] || {}; return `<tr><td class=sticky1><b>${fd(dt)}</b></td>${st.map(u => `<td><span class="tg ${rec[u] || '-'}" style="cursor:pointer" onclick="ah('${c.id}','${dt}','${u}')">${L[rec[u]] || '-'}</span></td>`).join('')}<td><button class="b s g" onclick="sel.ac='${c.id}';sel.ad='${dt}';go('att')">✏️</button> <button class="b s d" onclick="ahd('${c.id}','${dt}')">🗑</button></td></tr>`; }).join('')}</table></div><div class=ar><button class="b g" onclick="exportAttHistory('csv')">Excel</button><button class="b g" onclick="exportAttHistory('pdf')">PDF</button></div>` : emp('ไม่พบประวัติการเช็คชื่อตามเงื่อนไขที่เลือก')) + `</div>`
+        + (ds.length ? `<div class="card tw"><h3>สรุปการมาเรียนรายบุคคล (${ds.length} วัน)</h3><table><tr><th style="text-align:left">นักเรียน</th><th>มา</th><th>สาย</th><th>ขาด</th><th>ลา</th><th>% มาเรียน</th></tr>${sm.map(s => `<tr><td>${esc(lbl(c, s.u))}</td><td>${s.k.ม}</td><td>${s.k.ส}</td><td>${s.k.ข}</td><td>${s.k.ล}</td><td>${s.p == null ? '-' : `<span class="tg ${s.p < 80 ? 'z' : 'ม'}">${s.p.toFixed(0)}%</span>`}</td></tr>`).join('')}</table></div>` : '');
+}
+function ah(cid, dt, u) {
+    const cur = (D.att[cid + '|' + dt] || {})[u] || '-';
+    modal(esc(nm(u)) + ' — ' + fd(dt), `<div class=pill style="gap:8px;justify-content:center">${[...ASTS, ['-', 'ล้าง']].map(s => `<button class="${cur == s[0] ? 'on ' + (s[0] == '-' ? 'n' : s[0]) : ''}" style="padding:10px 18px;font-size:15px" onclick="ahs('${cid}','${dt}','${u}','${s[0]}')">${s[1]}</button>`).join('')}</div>`);
+}
+function ahs(cid, dt, u, v) { const k = cid + '|' + dt; D.att[k] = D.att[k] || {}; if (v == '-') delete D.att[k][u]; else D.att[k][u] = v; if (!Object.keys(D.att[k]).length) delete D.att[k]; save(); cm(); R(); toast('แก้ไขการเช็คชื่อแล้ว'); }
+function ahd(cid, dt) { if (!confirm('ลบข้อมูลเช็คชื่อวันที่ ' + fd(dt) + ' ทั้งวัน?')) return; delete D.att[cid + '|' + dt]; save(); R(); }
+function exportAttHistory(type) {
+    const c = D.classes.find(x => x.id == sel.hc), ds = Object.keys(D.att).filter(k => k.startsWith(c.id + '|')).map(k => k.split('|')[1]).sort(), st = ms(c);
+    ex([['วันที่', ...st.map(u => lbl(c, u))], ...ds.map(dt => { const r = D.att[c.id + '|' + dt] || {}; return [fd(dt), ...st.map(u => L[r[u]] || 'ยังไม่เช็ค')]; })], 'ประวัติเช็คชื่อ_' + c.name + '_' + c.sub, type);
+}
+ 
+function setNo(id, u, v) { const c = D.classes.find(x => x.id == id); c.no = c.no || {}; const n = Math.round(+v); if (n > 0) c.no[u] = n; else delete c.no[u]; save(); }
+function autoNo(id) { const c = D.classes.find(x => x.id == id); c.no = {}; [...c.m].sort((a, b) => nm(a).localeCompare(nm(b), 'th')).forEach((u, i) => c.no[u] = i + 1); save(); mem(id); R(); toast('เรียงเลขที่ตามชื่อแล้ว'); }
+ 
+const WH = { rot: 0, it: [], used: [], hist: [], spin: 0 };
+function wItems() {
+    const c = MC().find(x => x.id == sel.wc); let it = [];
+    if (sel.wm == 'custom') it = (sel.wt || '').split('\n').map(s => s.trim()).filter(Boolean).map(s => ({ k: s, l: s }));
+    else if (c) { let l = ms(c); if (sel.wp) { const a = D.att[c.id + '|' + today()] || {}; l = l.filter(u => a[u] == 'ม' || a[u] == 'ส'); } it = l.map(u => ({ k: u, l: sel.wm == 'no' ? String(rno(c, u) || '?') : sel.wm == 'both' ? lbl(c, u) : nm(u) })); }
+    if (sel.wx) it = it.filter(x => !WH.used.includes(x.k));
+    return it;
+}
+function wheelV() {
+    const cs = MC(); sel.wm = sel.wm || 'name'; if (cs.length) sel.wc = cs.find(c => c.id == sel.wc) ? sel.wc : cs[0].id; WH.it = wItems();
+    return head('🎡 วงล้อหรรษา') + `<div class=wheelbox><div class=card style="text-align:center"><canvas id=wc></canvas><div id=wres style="min-height:56px;margin:8px 0"></div><button class=b id=wbtn style="font-size:18px;padding:12px 40px" onclick="wspin()">🎲 หมุนเลย!</button><p class=mu id=wcnt>${WH.it.length} รายการในวง</p></div><div><div class=card><h3>ตั้งค่าวงล้อ</h3>${cs.length ? cpick(cs, 'wc') : emp('ยังไม่มีห้องเรียน')}<label class=fl>สุ่มจาก<select onchange="sel.wm=this.value;R()">${[['name', 'ชื่อนักเรียน'], ['no', 'เลขที่'], ['both', 'เลขที่ + ชื่อ'], ['custom', 'กำหนดรายการเอง']].map(o => `<option value=${o[0]} ${sel.wm == o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></label>${sel.wm == 'custom' ? `<label class=fl>รายการ (บรรทัดละ 1 รายการ)<textarea rows=5 onchange="sel.wt=this.value;wref()">${esc(sel.wt || '')}</textarea></label>` : `<label style="display:block;margin:6px 0"><input type=checkbox ${sel.wp ? 'checked' : ''} onchange="sel.wp=this.checked;R()"> เฉพาะคนที่มาเรียนวันนี้ (ตามการเช็คชื่อ)</label>`}<label style="display:block;margin:6px 0"><input type=checkbox ${sel.wx ? 'checked' : ''} onchange="sel.wx=this.checked;R()"> ไม่สุ่มซ้ำคนที่ถูกเลือกแล้ว</label><div class=ar><button class="b g s" onclick="WH.used=[];WH.hist=[];R()">รีเซ็ตรอบ</button></div></div><div class=card><h3>แบ่งกลุ่มสุ่ม</h3><div class=r2><label class=fl>จำนวนกลุ่ม<input type=number id=gn min=2 value="${sel.gn || 4}" onchange="sel.gn=this.value"></label><div class=ar style="align-items:end;margin:0"><button class=b onclick=wgrp()>สุ่มแบ่งกลุ่ม</button></div></div><div id=wgr></div></div><div class=card><h3>ประวัติการสุ่ม</h3><div id=whist>${whi()}</div></div></div></div>`;
+}
+const whi = () => WH.hist.map((h, i) => `<div class=li><span>${WH.hist.length - i}. ${esc(h)}</span></div>`).join('') || '<p class=mu>ยังไม่มีการสุ่ม</p>';
+function wref() { WH.it = wItems(); wdraw(); const e = $('#wcnt'); if (e) e.textContent = WH.it.length + ' รายการในวง'; }
+function wdraw() {
+    const cv = $('#wc'); if (!cv || !cv.getContext) return;
+    const it = WH.it, n = it.length, S = 420, dpr = window.devicePixelRatio || 1;
+    if (cv.width != S * dpr) { cv.width = S * dpr; cv.height = S * dpr; }
+    const x = cv.getContext('2d'); if (!x) return;
+    x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, S, S);
+    if (!n) { x.fillStyle = '#94a3b8'; x.font = '16px Prompt,sans-serif'; x.textAlign = 'center'; x.fillText('ไม่มีรายการในวงล้อ', S / 2, S / 2); return; }
+    const r = S / 2 - 14, seg = 2 * Math.PI / n; x.save(); x.translate(S / 2, S / 2);
+    for (let i = 0; i < n; i++) {
+        const a = WH.rot + i * seg; x.beginPath(); x.moveTo(0, 0); x.arc(0, 0, r, a, a + seg); x.closePath();
+        x.fillStyle = `hsl(${Math.round(i * 360 / n)} 72% ${i % 2 ? 56 : 48}%)`; x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke();
+        x.save(); x.rotate(a + seg / 2); x.fillStyle = '#fff'; x.textAlign = 'right'; x.font = `600 ${Math.max(9, Math.min(18, r * seg / 1.6))}px Prompt,sans-serif`;
+        x.fillText(it[i].l.length > 16 ? it[i].l.slice(0, 15) + '…' : it[i].l, r - 14, 5); x.restore();
+    }
+    x.beginPath(); x.arc(0, 0, 26, 0, 7); x.fillStyle = '#fff'; x.fill(); x.fillStyle = '#1a6df0'; x.font = '20px sans-serif'; x.textAlign = 'center'; x.fillText('🎡', 0, 7); x.restore();
+    x.beginPath(); x.moveTo(S / 2 - 15, 2); x.lineTo(S / 2 + 15, 2); x.lineTo(S / 2, 36); x.closePath(); x.fillStyle = '#ef4444'; x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 2; x.stroke();
+}
+function wspin() {
+    if (WH.spin) return; WH.it = wItems(); wdraw(); const it = WH.it, n = it.length; if (!n) return toast('ไม่มีรายการให้สุ่ม');
+    WH.spin = 1; $('#wbtn').disabled = true; $('#wres').innerHTML = '';
+    const w = Math.floor(Math.random() * n), seg = 2 * Math.PI / n, tw = 1.5 * Math.PI - (w + .5) * seg, cur = WH.rot, P = 2 * Math.PI, d = (((tw - cur) % P) + P) % P + P * (5 + Math.floor(Math.random() * 3)), t0 = performance.now(), T = 5200;
+    const step = t => { const p = Math.min(1, (t - t0) / T); WH.rot = cur + d * (1 - Math.pow(1 - p, 3)); wdraw(); if (p < 1) requestAnimationFrame(step); else { WH.spin = 0; wdone(it[w]); } };
+    requestAnimationFrame(step);
+}
+function wdone(x) {
+    WH.hist.unshift(x.l); if (sel.wx) WH.used.push(x.k); beep();
+    const e = $('#wres'); if (e) e.innerHTML = `<div style="font-size:30px;font-weight:600;color:var(--p)">🎉 ${esc(x.l)}</div>`;
+    const b = $('#wbtn'); if (b) b.disabled = false; const h = $('#whist'); if (h) h.innerHTML = whi();
+}
+function beep() { try { const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(), v = a.createGain(); o.connect(v); v.connect(a.destination); o.frequency.value = 880; v.gain.setValueAtTime(.15, a.currentTime); v.gain.exponentialRampToValueAtTime(.001, a.currentTime + .5); o.start(); o.stop(a.currentTime + .5); } catch (e) {} }
+function wgrp() {
+    const c = MC().find(x => x.id == sel.wc), l = sel.wm == 'custom' ? WH.it.map(x => x.l) : c ? ms(c).map(u => lbl(c, u)) : [];
+    if (!l.length) return toast('ไม่มีรายชื่อ');
+    const n = Math.max(2, Math.min(+g('gn') || 4, l.length)), a = [...l];
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    const gs = Array.from({ length: n }, () => []); a.forEach((x, i) => gs[i % n].push(x));
+    $('#wgr').innerHTML = gs.map((x, i) => `<div class=li style="display:block"><b>กลุ่ม ${i + 1}</b> <small class=mu>(${x.length} คน)</small><br>${x.map(esc).join(', ')}</div>`).join('');
+}
+ 
+const _home = home;
+home = () => {
+    const h = _home(), cs = MC(); let add = '';
+    if (isT()) { let nr = 0, nz = 0; cs.forEach(c => c.m.forEach(u => { const x = gst(c, u); if (x.f == 'ร') nr++; else if (x.f == '0') nz++; })); if (nr || nz) add = `<div class=card style="border-left:4px solid #f59e0b"><b>⚠️ ต้องติดตาม:</b> ติด ร ${nr} รายการ · เสี่ยงติด 0 ${nz} รายการ <button class="b s" style="margin-left:8px" onclick="go('scores')">ดูประวัติคะแนน</button></div>`; }
+    else { const n = cs.reduce((a, c) => a + D.tasks.filter(t => t.c == c.id && !t.man && tst(t, me.id) == 'miss').length, 0); if (n) add = `<div class=card style="border-left:4px solid #ef4444"><b>⚠️ คุณมีงานขาดส่ง ${n} รายการ</b> — ส่งเร็วที่สุดเพื่อไม่ให้ติด ร <button class="b s" style="margin-left:8px" onclick="go('scores')">ดูรายละเอียด</button></div>`; }
+    return add ? h.replace('</div></div>', '</div></div>' + add) : h;
+};
+const _R = R;
+R = function () { _R(); if (V == 'wheel') wdraw(); };
+ 
+const LTR = 'กขคงจฉชซฌญ';
+const wide = (title, body, w) => { $('#m').innerHTML = `<div class=mo onclick="if(event.target==this)cm()"><div class=md style="width:min(${w || 820}px,100%)"><h3>${title}</h3>${body}<div class=ar><button class="b g" onclick=cm()>ปิด</button></div></div></div>`; };
+const normC = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const gen = (n = 6) => { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', a = new Uint32Array(n); (window.crypto || { getRandomValues: x => x.forEach((_, i) => x[i] = Math.random() * 4e9) }).getRandomValues(a); return Array.from(a, x => A[x % 32]).join(''); };
+const rpw = (n = 6) => { const A = 'abcdefghjkmnpqrstuvwxyz23456789', a = new Uint32Array(n); (window.crypto || { getRandomValues: x => x.forEach((_, i) => x[i] = Math.random() * 4e9) }).getRandomValues(a); return Array.from(a, x => A[x % 31]).join(''); };
+function h53(s){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^h1>>>16,2246822507)^Math.imul(h2^h2>>>13,3266489909);h2=Math.imul(h2^h2>>>16,2246822507)^Math.imul(h1^h1>>>13,3266489909);return(h1>>>0)^(h2>>>0)}
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuf(a,r){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function xparse(t){const out=[];let cur=null,m;
+ t=t.replace(/\u00a0|\u200b/g,' ').replace(/\r/g,'');
+ if(!/\n/.test(t.trim()))t=t.replace(/\s+(?=(?:ข้อ\s*\d+\s*[\.\):：]|เฉลย\s*[:：]))/g,'\n').replace(/\s+(?=[กขคงจ][\.\)]\s)/g,'\n');
+ const li=c=>{c=c.toLowerCase();let i='abcde'.indexOf(c);if(i<0)i=LTR.indexOf(c);if(i<0)i=parseInt(c)-1;return i};
+ const nq=x=>{cur={q:x,c:[],a:0,p:1,h:0};out.push(cur)};
+ for(let l of t.split('\n')){l=l.trim();if(!l)continue;
+  if(cur&&(m=l.match(/^(?:เฉลย|คำตอบ|ตอบ|ans(?:wer)?)\s*[:：\-]?\s*(?:ข้อ\s*)?\(?([A-Ea-eกขคงจ1-5])(?![ก-๙a-z])/i))){cur.a=Math.max(0,li(m[1]));cur.h=1}
+  else if(m=l.match(/^(?:ข้อ(?:ที่)?\s*)?(?:Q\s*)?(\d+)\s*[\.\):：]\s*(.*)$/i)){nq(m[2])}
+  else if(m=l.match(/^ข้อ(?:ที่)?\s*(\d+)\s+(.+)$/)){nq(m[2])}
+  else if(cur&&(m=l.match(/^\(?([A-Ea-eกขคงจ])\s*[\.\):：]\s*(.+)/))){let x=m[2].trim();if(/[*✓✔]$/.test(x)){x=x.replace(/\s*[*✓✔]$/,'');cur.a=cur.c.length;cur.h=1}cur.c.push(x)}
+  else if(cur&&cur.c.length&&!cur.h)cur.c[cur.c.length-1]+=' '+l;
+  else if(cur&&!cur.c.length)cur.q+=' '+l;
+  else nq(l)}
+ return out.filter(q=>q.c.length>=2)}
+ 
+const XD = { pass: 50, neg: 0, shQ: 0, shC: 0, ver: 1, showScore: 1, showAns: 1, one: 0, req: 0, code: '', st: '', en: '' };
+const xs = t => ({ ...XD, ...(t.xs || {}) });
+const xopen = t => { const x = xs(t), n = Date.now(); return !!t.open && (!x.st || n >= +new Date(x.st)) && (!x.en || n <= +new Date(x.en)); };
+let XE = null;
+function exed(id) {
+    const cs = MC(); if (!cs.length) return toast('สร้างห้องเรียนก่อน');
+    const t = D.tasks.find(x => x.id == id);
+    XE = t ? JSON.parse(JSON.stringify({ id: t.id, c: t.c, t: t.t, ds: t.ds || '', k: t.k || 'q', dur: t.dur == null ? 30 : t.dur, open: !!t.open, q: t.q || [], xs: xs(t) }))
+           : { id: '', c: sel.sc || cs[0].id, t: '', ds: '', k: 'q', dur: 30, open: false, q: [], xs: { ...XD, code: gen() } };
+    XE.tab = 'q'; exrd();
+}
+function exrd() {
+    const keep = ($('#m .md') || {}).scrollTop || 0, e = XE, x = e.xs, sum = Math.round(e.q.reduce((a, q) => a + (+q.p || 0), 0) * 100) / 100;
+    const top = `<div class=r2><label class=fl>ชื่อข้อสอบ<input value="${esc(e.t)}" oninput="XE.t=this.value"></label><label class=fl>ห้องเรียน<select onchange="XE.c=this.value">${MC().map(c => `<option value=${c.id} ${c.id == e.c ? 'selected' : ''}>${esc(c.name + ' ' + c.sub)}</option>`).join('')}</select></label></div><div class=r2><label class=fl>ประเภทการสอบ (ตรงกับหมวดคะแนน)<select onchange="XE.k=this.value">${Object.entries(KD).map(([k, v]) => `<option value=${k} ${k == e.k ? 'selected' : ''}>${v}</option>`).join('')}</select></label><label class=fl>สถานะ<select onchange="XE.open=this.value=='1'"><option value=0 ${!e.open ? 'selected' : ''}>ปิดสอบ</option><option value=1 ${e.open ? 'selected' : ''}>เปิดสอบ</option></select></label></div><label class=fl>คำชี้แจงข้อสอบ<input value="${esc(e.ds)}" oninput="XE.ds=this.value"></label>`;
+    const tabs = `<div class=pill style="margin:6px 0 10px">${[['q', '📝 ข้อสอบ'], ['s', '⚙️ ตั้งค่า'], ['c', '🔑 รหัสเข้าสอบ']].map(t => `<button class="${e.tab == t[0] ? 'on n' : ''}" onclick="XE.tab='${t[0]}';exrd()">${t[1]}</button>`).join('')}</div>`;
+    const tg2 = (l, k, h) => `<label class=li style="cursor:pointer"><span>${l}<br><small class=mu>${h}</small></span><input type=checkbox ${x[k] ? 'checked' : ''} onchange="XE.xs.${k}=this.checked?1:0"></label>`;
+    const nu = (l, k, u) => `<label class=fl>${l}<input type=number min=0 step=any value="${x[k]}" oninput="XE.xs.${k}=+this.value||0"> <small>${u}</small></label>`;
+    let b = '';
+    if (e.tab == 'q') b = `<div class=card style="padding:12px"><b>⚡ วางข้อสอบทั้งชุด</b><p class=mu>รองรับ <code>1. คำถาม</code> → <code>ก. ตัวเลือก</code> (หรือ A. B. C.) → <code>เฉลย: ข</code> หรือใส่ * ท้ายตัวเลือกที่ถูก</p><textarea id=xbulk rows=6 placeholder="1. เมืองหลวงของไทยคือ?&#10;ก. เชียงใหม่&#10;ข. กรุงเทพฯ&#10;ค. ภูเก็ต&#10;เฉลย: ข"></textarea><div class=ar style="justify-content:flex-start"><button class=b onclick=xbulk()>แปลงเป็นข้อสอบ</button><label class="b g">📄 นำเข้าไฟล์ .txt<input type=file accept=".txt,.csv" hidden onchange=xfile(this)></label><button class="b g" onclick=xaddq()>+ เพิ่มทีละข้อ</button><span class=tg>${e.q.length} ข้อ · ${sum} คะแนน</span></div></div>` + e.q.map((q, i) => `<div class=card style="padding:12px"><div class=hd style="margin:0 0 6px"><span class=tg>ข้อ ${i + 1}</span><div><label class=mu>คะแนน <input type=number min=0 step=any style="width:72px;display:inline-block" value="${q.p}" oninput="XE.q[${i}].p=+this.value||0"></label> <button class="b s g" onclick="xmv(${i},-1)">↑</button> <button class="b s g" onclick="xmv(${i},1)">↓</button> <button class="b s g" onclick="xdup(${i})">⧉</button> <button class="b s d" onclick="XE.q.splice(${i},1);exrd()">🗑</button></div></div><textarea rows=2 oninput="XE.q[${i}].q=this.value">${esc(q.q)}</textarea>${q.c.map((c, j) => `<div class=li style="gap:6px"><input type=radio name=xa${i} ${q.a === j ? 'checked' : ''} onchange="XE.q[${i}].a=${j}"><b>${LTR[j] || j + 1}</b><input value="${esc(c)}" oninput="XE.q[${i}].c[${j}]=this.value"><button class="b s g" onclick="xdc(${i},${j})">✕</button></div>`).join('')}<button class="b s g" onclick="XE.q[${i}].c.push('');exrd()">+ ตัวเลือก</button></div>`).join('');
+    if (e.tab == 's') b = `<div class=gr2><div class=card><b>⏱ เวลาและคะแนน</b><label class=fl>เวลาสอบ (0 = ไม่จำกัด)<input type=number min=0 value="${e.dur}" oninput="XE.dur=+this.value||0"> <small>นาที</small></label>${nu('เกณฑ์ผ่าน', 'pass', '%')}<label class=fl>หักคะแนนเมื่อตอบผิด<select onchange="XE.xs.neg=+this.value">${[[0, 'ไม่หัก'], [.25, 'หัก 1/4 ของคะแนนข้อ'], [.5, 'หัก 1/2'], [1, 'หักเต็มคะแนนข้อ']].map(o => `<option value=${o[0]} ${x.neg === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></label></div><div class=card><b>🔀 การสลับข้อสอบ</b>${tg2('สลับลำดับข้อ', 'shQ', 'ป้องกันการลอก')}${tg2('สลับลำดับตัวเลือก', 'shC', 'เฉลยปรับให้อัตโนมัติ')}${nu('จำนวนชุดข้อสอบ (ก, ข, ค…)', 'ver', 'ชุด')}</div><div class=card><b>📊 ผลสอบ</b>${tg2('แสดงคะแนนทันที', 'showScore', 'นักเรียนเห็นคะแนนหลังส่ง')}${tg2('แสดงเฉลย', 'showAns', 'ดูข้อถูก/ผิดหลังส่ง (ต้องแสดงคะแนนด้วย)')}</div><div class=card><b>🛡 การทำข้อสอบ</b>${tg2('แสดงทีละข้อ', 'one', 'ย้อนกลับไปแก้ได้')}${tg2('ต้องกรอกรหัสก่อนเริ่มสอบ', 'req', 'ครูบอกรหัสหน้าห้อง')}<label class=fl>เปิดรับสอบตั้งแต่ (ไม่บังคับ)<input type=datetime-local value="${esc(x.st)}" onchange="XE.xs.st=this.value"></label><label class=fl>ปิดรับสอบเมื่อ (ไม่บังคับ)<input type=datetime-local value="${esc(x.en)}" onchange="XE.xs.en=this.value"></label></div></div>`;
+    if (e.tab == 'c') b = `<div class=card><b>🔑 รหัสเข้าสอบ</b><p class=mu>นักเรียนกรอกรหัสนี้ในหน้า “การสอบ” เพื่อเข้าสอบทันที (ถ้าเปิด “ต้องกรอกรหัสก่อนเริ่มสอบ” จะบังคับใช้)</p><div style="font-size:32px;font-weight:700;letter-spacing:6px;text-align:center;margin:10px 0">${esc(x.code || '-')}</div><div class=ar style="justify-content:center"><button class="b g" onclick="navigator.clipboard&&navigator.clipboard.writeText(XE.xs.code);toast('คัดลอกแล้ว')">คัดลอก</button><button class="b g" onclick="XE.xs.code=gen();exrd()">🎲 สุ่มรหัสใหม่</button></div><label class=fl>กำหนดรหัสเอง (A-Z, 0-9 จำนวน 4-12 ตัว)<input value="${esc(x.code)}" maxlength=12 onchange="xsc(this.value)"></label></div>`;
+    $('#m').innerHTML = `<div class=mo><div class=md style="width:min(840px,100%)"><h3>${e.id ? 'แก้ไขข้อสอบ' : 'สร้างข้อสอบ'}</h3>${top}${tabs}${b}<div class=ar><button class="b g" onclick=cm()>ยกเลิก</button><button class=b onclick=exsv()>💾 บันทึกข้อสอบ</button></div></div></div>`;
+    const m = $('#m .md'); if (m) m.scrollTop = keep;
+}
+const xaddq = () => { XE.q.push({ q: '', c: ['', '', '', ''], a: 0, p: 1 }); exrd(); };
+const xmv = (i, d) => { const j = i + d; if (j < 0 || j >= XE.q.length) return; [XE.q[i], XE.q[j]] = [XE.q[j], XE.q[i]]; exrd(); };
+const xdup = i => { XE.q.splice(i + 1, 0, JSON.parse(JSON.stringify(XE.q[i]))); exrd(); };
+const xdc = (i, j) => { const q = XE.q[i]; if (q.c.length <= 2) return toast('ต้องมีอย่างน้อย 2 ตัวเลือก'); q.c.splice(j, 1); if (q.a == j) q.a = 0; else if (q.a > j) q.a--; exrd(); };
+function xbulk() { const q = xparse($('#xbulk').value); if (!q.length) return toast('ไม่พบข้อสอบ ตรวจรูปแบบอีกครั้ง'); const na = q.filter(x => !x.h).length; q.forEach(x => { x.p = 1; delete x.h; }); XE.q.push(...q); exrd(); toast('เพิ่ม ' + q.length + ' ข้อ' + (na ? ` (ไม่มีเฉลย ${na} ข้อ ตรวจสอบจุดวงกลม)` : '')); }
+function xfile(i) { const f = i.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { $('#xbulk').value = String(r.result); xbulk(); }; r.readAsText(f); }
+function xsc(v) { v = normC(v).slice(0, 12); if (v.length < 4) { toast('รหัสต้องมี 4-12 ตัว'); return exrd(); } if (D.tasks.some(t => t.y == 'ex' && t.id != XE.id && xs(t).code === v)) { toast('รหัสนี้ซ้ำกับข้อสอบอื่น'); return exrd(); } XE.xs.code = v; exrd(); }
+function exsv() {
+    const e = XE, n = (e.t || '').trim(); if (!n) return toast('กรอกชื่อข้อสอบ');
+    const q = []; e.q.forEach(o => { const c = [], idx = []; o.c.forEach((s, j) => { if (String(s).trim() !== '') { idx.push(j); c.push(String(s).trim()); } }); const a = idx.indexOf(o.a); if (String(o.q).trim() && c.length >= 2 && a >= 0) q.push({ q: String(o.q).trim(), c, a, p: Math.max(0, Math.round((+o.p || 0) * 100) / 100) }); });
+    if (!q.length) return toast('ต้องมีข้อสอบอย่างน้อย 1 ข้อ: มีโจทย์ ตัวเลือกอย่างน้อย 2 ช่อง และเลือกเฉลยในตัวเลือกที่ไม่ว่าง');
+    if (q.length < e.q.length && !confirm(`มี ${e.q.length - q.length} ข้อที่ไม่ครบ (โจทย์/ตัวเลือก/เฉลย) จะถูกข้าม ต้องการบันทึกต่อหรือไม่?`)) return;
+    let t = D.tasks.find(x => x.id == e.id); if (!t) { t = { id: uid(), y: 'ex', s: {} }; D.tasks.push(t); }
+    const X = { ...e.xs }; if (!X.code || D.tasks.some(o => o.y == 'ex' && o.id != t.id && xs(o).code === X.code)) X.code = gen();
+    Object.assign(t, { c: e.c, t: n, ds: e.ds, k: e.k, dur: Math.max(0, +e.dur || 0), open: !!e.open, q, max: Math.round(q.reduce((a, x) => a + x.p, 0) * 100) / 100, d: '', xs: X });
+    save(); cm(); R(); toast('บันทึกข้อสอบแล้ว (' + q.length + ' ข้อ)');
+}
+function exb(t, u) { const x = xs(t), vv = x.ver > 1 ? h53(String(u)) % x.ver : 0, r = rng(h53(String(u) + t.id + vv)); let qs = t.q.map((q, oi) => ({ q: q.q, p: q.p, oi, idx: q.c.map((_, i) => i) })); if (x.shC) qs = qs.map(q => ({ ...q, idx: shuf(q.idx, r) })); if (x.shQ) qs = shuf(qs, r); return qs; }
+function exscore(t, a) { const x = xs(t); let g = 0; t.q.forEach((q, i) => { const v = a[i]; if (v === undefined || v === null) return; if (v === q.a) g += q.p; else if (x.neg) g -= q.p * x.neg; }); return Math.max(0, Math.round(g * 100) / 100); }
+const EX = { id: '', i: 0 };
+function exs(id, ok) {
+    const t = D.tasks.find(x => x.id == id), x = xs(t);
+    if (t.s[me.id]) return exui(id);
+    if (!xopen(t)) return toast('ยังไม่เปิดสอบ หรือหมดเวลาเปิดรับสอบแล้ว');
+    if (x.req && !ok) { const c = prompt('กรอกรหัสเข้าสอบ (ขอจากครูผู้สอน)'); if (c === null) return; if (normC(c) !== normC(x.code)) return toast('รหัสเข้าสอบไม่ถูกต้อง'); }
+    if (!confirm(`เริ่มสอบ "${t.t}"\nเวลา ${t.dur > 0 ? t.dur + ' นาที (เริ่มแล้วเวลาจะเดินต่อแม้ปิดหน้านี้)' : 'ไม่จำกัด'}\nเริ่มเลยหรือไม่?`)) return;
+    t.s[me.id] = { run: 1, st: Date.now(), a: {}, g: null, t: today() }; save(); exui(id);
+}
+function exui(id) {
+    const t = D.tasks.find(x => x.id == id), s = t.s[me.id]; if (!s || !s.run) return;
+    const x = xs(t), end = t.dur > 0 ? s.st + t.dur * 60000 : 0; if (end && Date.now() >= end) return exf(id, 1);
+    const qs = exb(t, me.id), n = qs.length; if (EX.id != id) { EX.id = id; EX.i = 0; }
+    const i = Math.max(0, Math.min(EX.i, n - 1)), show = x.one ? [i] : qs.map((_, k) => k);
+    const card = k => { const q = qs[k]; return `<div class=li style="display:block"><p><b>ข้อ ${k + 1}.</b> (${q.p} คะแนน) ${esc(q.q)}</p>${q.idx.map((j, m) => `<label style="display:block;padding:5px 0"><input type=radio name=q${k} ${s.a[q.oi] === j ? 'checked' : ''} onchange="exa('${id}',${q.oi},${j})"> <b>${LTR[m] || m + 1}.</b> ${esc(t.q[q.oi].c[j])}</label>`).join('')}</div>`; };
+    $('#m').innerHTML = `<div class=mo><div class=md style="width:min(680px,100%)"><div class=hd><h3>${esc(t.t)}${x.ver > 1 ? ` <small>(ชุด ${LTR[h53(String(me.id)) % x.ver]})</small>` : ''}</h3><b id=tmr>${end ? '' : 'ไม่จำกัดเวลา'}</b></div><div class=pill style="margin:6px 0"><span class=tg>ตอบแล้ว <span id=xans>${Object.keys(s.a).length}</span>/${n}</span></div>${show.map(card).join('')}${x.one ? `<div class=ar><button class="b g" ${i ? '' : 'disabled'} onclick="EX.i=${i - 1};exui('${id}')">◀ ก่อนหน้า</button>${i < n - 1 ? `<button class=b onclick="EX.i=${i + 1};exui('${id}')">ถัดไป ▶</button>` : ''}<span class=mu>ข้อ ${i + 1}/${n}</span></div>` : ''}<div class=ar><button class=b onclick="exc('${id}')">ส่งข้อสอบ</button></div></div></div>`;
+    clearInterval(window.tm);
+    if (end) { const tick = () => { const r = end - Date.now(); if (r <= 0) return exf(id, 1); const e = $('#tmr'); if (e) e.textContent = '⏱ ' + Math.floor(r / 60000) + ':' + String(Math.floor(r / 1000) % 60).padStart(2, '0'); }; tick(); window.tm = setInterval(tick, 1000); }
+}
+const exa = (id, oi, j) => { const s = D.tasks.find(x => x.id == id).s[me.id]; s.a[oi] = j; save(); const e = $('#xans'); if (e) e.textContent = Object.keys(s.a).length; };
+const exc = id => { const t = D.tasks.find(x => x.id == id), s = t.s[me.id], un = t.q.length - Object.keys(s.a).length; if (confirm((un ? `ยังไม่ได้ตอบ ${un} ข้อ\n` : '') + 'ยืนยันส่งข้อสอบ? ส่งแล้วแก้ไขไม่ได้')) exf(id); };
+function exf(id, auto) {
+    clearInterval(window.tm); const t = D.tasks.find(x => x.id == id), s = t.s[me.id]; if (!s || !s.run) return;
+    s.g = exscore(t, s.a); delete s.run; s.t = today(); s.fin = Date.now(); save(); cm(); R();
+    if (xs(t).showScore) { if (xs(t).showAns) exrev(id); else toast((auto ? 'หมดเวลา ส่งอัตโนมัติ ' : 'ส่งแล้ว ') + `ได้ ${s.g}/${t.max} คะแนน`); } else toast('ส่งข้อสอบเรียบร้อย ผลสอบจะประกาศโดยครู');
+}
+function exrev(id) {
+    const t = D.tasks.find(x => x.id == id), s = t.s[me.id], X = xs(t); if (!s || s.run) return;
+    const pc = t.max ? s.g / t.max * 100 : 0;
+    wide('ผลสอบ: ' + esc(t.t), `<div class=card style="text-align:center"><div style="font-size:34px;font-weight:700;color:var(--p)">${s.g} / ${t.max}</div><div>${pc.toFixed(1)}% · <span class="tg ${pc >= X.pass ? 'ม' : 'ข'}">${pc >= X.pass ? 'ผ่าน' : 'ไม่ผ่าน'} (เกณฑ์ ${X.pass}%)</span></div></div>` + (X.showAns ? t.q.map((q, i) => { const v = s.a[i], ok = v === q.a; return `<div class=li style="display:block"><p><b>ข้อ ${i + 1}.</b> ${esc(q.q)} <span class="tg ${v === undefined ? 'ส' : ok ? 'ม' : 'ข'}">${v === undefined ? 'ไม่ได้ตอบ' : ok ? 'ถูก' : 'ผิด'}</span></p><small class=mu>คำตอบของคุณ: ${v === undefined ? '-' : esc(q.c[v])} · เฉลย: <b>${esc(q.c[q.a])}</b></small></div>`; }).join('') : ''), 700);
+}
+function exjoin() { const c = normC($('#xcode').value), ids = MC().map(x => x.id), t = D.tasks.find(x => x.y == 'ex' && ids.includes(x.c) && xs(x).code && xs(x).code === c); if (!c || !t) return toast('ไม่พบข้อสอบที่ตรงกับรหัสนี้'); exs(t.id, true); }
+function exrows(t) { const c = D.classes.find(x => x.id == t.c), X = xs(t); return [['เลขที่', 'ชื่อ-นามสกุล', 'คะแนน', 'เต็ม', 'ร้อยละ', 'ผล'], ...ms(c).map(u => { const s = t.s[u]; return s && !s.run ? [rno(c, u), nm(u), s.g, t.max, (s.g / t.max * 100).toFixed(1), s.g / t.max * 100 >= X.pass ? 'ผ่าน' : 'ไม่ผ่าน'] : [rno(c, u), nm(u), '-', t.max, '-', s && s.run ? 'กำลังสอบ' : 'ยังไม่สอบ']; })]; }
+function exres(id) {
+    const t = D.tasks.find(x => x.id == id), c = D.classes.find(x => x.id == t.c), X = xs(t), all = ms(c), fin = all.filter(u => t.s[u] && !t.s[u].run), run = all.filter(u => t.s[u] && t.s[u].run).length;
+    const sc0 = fin.map(u => +t.s[u].g), mx = +t.max || 1, avg = sc0.length ? sc0.reduce((a, b) => a + b) / sc0.length : null, pass = fin.filter(u => t.s[u].g / mx * 100 >= X.pass).length;
+    const item = t.q.map((q, i) => { const a = fin.filter(u => t.s[u].a && t.s[u].a[i] !== undefined), ok = a.filter(u => t.s[u].a[i] === q.a).length; return { i, p: fin.length ? ok / fin.length * 100 : null }; });
+    wide('ผลสอบ: ' + esc(t.t), `<div class=grid>${sc(fin.length + '/' + all.length, 'สอบแล้ว')}${sc(avg == null ? '-' : (avg / mx * 100).toFixed(1) + '%', 'คะแนนเฉลี่ย')}${sc(sc0.length ? Math.max(...sc0) + '/' + t.max : '-', 'สูงสุด')}${sc(fin.length ? Math.round(pass / fin.length * 100) + '%' : '-', 'ผ่านเกณฑ์ ' + X.pass + '%')}</div><div class=ar style="margin:0 0 8px"><span class=tg>กำลังสอบ ${run}</span><button class="b g s" onclick="exx('${id}','csv')">Excel</button><button class="b g s" onclick="exx('${id}')">PDF</button><button class="b g s" onclick="xshow('${id}')">${X.showScore ? '🙈 ซ่อนผลจากนักเรียน' : '📢 ประกาศผลให้นักเรียน'}</button></div><div class=tw><table><tr><th>เลขที่</th><th style="text-align:left">ชื่อ</th><th>คะแนน</th><th>%</th><th>ผล</th><th></th></tr>${all.map(u => { const s = t.s[u], ok = s && !s.run; return `<tr><td>${rno(c, u) || '-'}</td><td style="text-align:left">${esc(nm(u))}</td><td>${ok ? s.g + '/' + t.max : s ? 'กำลังสอบ' : 'ยังไม่สอบ'}</td><td>${ok ? (s.g / mx * 100).toFixed(0) + '%' : '-'}</td><td>${ok ? `<span class="tg ${s.g / mx * 100 >= X.pass ? 'ม' : 'ข'}">${s.g / mx * 100 >= X.pass ? 'ผ่าน' : 'ไม่ผ่าน'}</span>` : '-'}</td><td>${s ? `<button class="b s d" onclick="exr('${id}','${u}')">ให้สอบใหม่</button>` : ''}</td></tr>`; }).join('')}</table></div><h3 style="margin-top:14px">วิเคราะห์รายข้อ (% ตอบถูก)</h3>${item.map(x => `<div class=li style="gap:8px"><span style="width:52px">ข้อ ${x.i + 1}</span><div class=bar style="flex:1;margin:0"><i style="width:${x.p || 0}%"></i></div><span style="width:60px;text-align:right">${x.p == null ? '-' : x.p.toFixed(0) + '%'}</span></div>`).join('')}`, 860);
+}
+const exx = (id, f) => { const t = D.tasks.find(x => x.id == id); ex(exrows(t), 'ผลสอบ ' + t.t, f); };
+const xshow = id => { const t = D.tasks.find(x => x.id == id); t.xs = { ...xs(t), showScore: xs(t).showScore ? 0 : 1 }; save(); exres(id); R(); };
+function tdup(id) { const t = D.tasks.find(x => x.id == id), cs = MC(); modal('คัดลอก “' + esc(t.t) + '”', fld('คัดลอกไปยังห้อง', 'f1', t.c, 'select', cs.map(c => [c.id, c.name + ' ' + c.sub])), `tdupo('${id}')`); }
+function tdupo(id) { const t = D.tasks.find(x => x.id == id), n = JSON.parse(JSON.stringify(t)); n.id = uid(); n.s = {}; n.c = g('f1'); n.t = t.t + ' (สำเนา)'; delete n.done; if (n.y == 'ex') { n.open = false; n.xs = { ...xs(t), code: gen() }; } D.tasks.push(n); save(); cm(); R(); toast('คัดลอกแล้ว'); }
+{ const _tasks = tasks; tasks = ty => { const h = _tasks(ty); return ty == 'ex' && !isT() ? h.replace('</div></div>', '</div></div>' + `<div class=card><b>🔑 เข้าสอบด้วยรหัส</b><div class=r3 style="margin-top:8px"><input id=xcode placeholder="กรอกรหัสเข้าสอบ" maxlength=12 style="text-transform:uppercase;letter-spacing:3px;font-weight:600" onkeydown="if(event.key==='Enter')exjoin()"><button class=b onclick=exjoin()>เข้าสอบ</button></div></div>`) : h; }; }
+ 
+let LASTCRED = [], UA = { tab: 'one', cid: '', rows: [] }, US = [];
+const visU = () => me.role == 'admin' ? D.users.filter(u => u.id != me.id) : D.users.filter(u => u.role == 'student');
+const ucls = u => MC().filter(c => c.m.includes(u.id));
+function nextU(pre, used) { let m = 0; D.users.forEach(u => { const k = new RegExp('^' + pre + '(\\d+)$').exec(u.u || ''); if (k) m = Math.max(m, +k[1]); }); let n = m + 1, u; do { u = pre + String(n++).padStart(4, '0'); } while (used.has(u.toLowerCase())); return u; }
+function uaParse(text, role) {
+    const used = new Set(D.users.map(u => String(u.u || '').toLowerCase())), rows = [], pre = role == 'teacher' ? 'tch' : 'std';
+    text.replace(/\r/g, '').split('\n').forEach((ln, i) => {
+        ln = ln.trim(); if (!ln) return; const p = ln.split(/[,\t;]/).map(s => s.trim().replace(/^"|"$/g, '')); if (i == 0 && /^(ชื่อ|name|ลำดับ|เลขที่)/i.test(p[0]) && !/\d{3,}/.test(p[0])) return;
+        let name = '', no = '', u = '', pw = ''; const rest = [];
+        p.forEach(x => { if (!x) return; if (!name && /[^\d\s]/.test(x)) name = x; else if (!no && /^\d{1,3}$/.test(x)) no = x; else rest.push(x); });
+        if (!name) { const t = p.filter(Boolean); name = t.join(' '); }
+        u = rest[0] || ''; pw = rest[1] || '';
+        const row = { name, no, u, p: pw, au: !u, ap: !pw }; if (!row.u) row.u = nextU(pre, used); used.add(row.u.toLowerCase()); if (!row.p) row.p = rpw(); rows.push(row);
+    });
+    return rows;
+}
+function addU(cid, tab) { UA = { tab: tab || 'one', cid: cid || '', rows: [], role: 'student' }; uaR(); }
+function uaR() {
+    const cs = MC(), adm = me.role == 'admin', clsF = fld('เพิ่มเข้าห้องเรียน', 'fcl', UA.cid, 'select', [['', '— ไม่เพิ่มเข้าห้อง —'], ...cs.map(c => [c.id, c.name + ' ' + c.sub])]), roleF = adm ? fld('บทบาท', 'frl', UA.role, 'select', [['student', 'นักเรียน'], ['teacher', 'ครู']]) : '';
+    const tabs = `<div class=pill style="margin:4px 0 10px">${[['one', '➕ ทีละคน'], ['bulk', '📥 หลายคน / ไฟล์รายชื่อ']].map(t => `<button class="${UA.tab == t[0] ? 'on n' : ''}" onclick="uaT('${t[0]}')">${t[1]}</button>`).join('')}</div>`;
+    const one = `${roleF}${clsF}<div class=r2>${fld('ชื่อ-นามสกุล', 'fnm')}${fld('เลขที่ (ถ้ามี)', 'fno', '', 'number')}</div><div class=r2>${fld('ชื่อผู้ใช้ (ว่าง = สร้างให้อัตโนมัติ)', 'fun')}${fld('รหัสผ่าน (ว่าง = สร้างให้อัตโนมัติ)', 'fpw')}</div><div class=ar><button class="b g" onclick=cm()>ยกเลิก</button><button class=b onclick=uaOne()>สร้างบัญชี</button></div>`;
+    const bulk = `${roleF}${clsF}<label class=fl>วางรายชื่อ (บรรทัดละ 1 คน) รูปแบบ: <code>ชื่อ-นามสกุล, เลขที่, ชื่อผู้ใช้, รหัสผ่าน</code> — ใส่เฉพาะชื่อก็ได้ ระบบสร้างชื่อผู้ใช้/รหัสผ่านให้เอง<textarea id=fbk rows=6 placeholder="สมชาย ใจดี, 1&#10;สมหญิง รักเรียน, 2, somying, 1234&#10;วิชัย ตั้งใจ">${esc(UA.text || '')}</textarea></label><div class=ar style="justify-content:flex-start"><label class="b g">📄 นำเข้าไฟล์ .csv / .txt<input type=file accept=".csv,.txt,.tsv" hidden onchange=uaFile(this)></label><button class=b onclick=uaPrev()>ตรวจสอบรายชื่อ</button></div>${UA.rows.length ? `<div class=tw><table><tr><th>#</th><th>เลขที่</th><th style="text-align:left">ชื่อ</th><th>ชื่อผู้ใช้</th><th>รหัสผ่าน</th><th></th></tr>${UA.rows.map((r, i) => `<tr><td>${i + 1}</td><td>${r.no || '-'}</td><td style="text-align:left">${esc(r.name)}</td><td><code>${esc(r.u)}</code>${r.au ? ' <small class=mu>อัตโนมัติ</small>' : ''}</td><td><code>${esc(r.p)}</code>${r.ap ? ' <small class=mu>อัตโนมัติ</small>' : ''}</td><td><button class="b s d" onclick="UA.rows.splice(${i},1);uaR()">✕</button></td></tr>`).join('')}</table></div><div class=ar><span id=upg class=mu></span><button class="b g" onclick=cm()>ยกเลิก</button><button class=b id=ubtn onclick=uaGo()>สร้างบัญชีทั้งหมด (${UA.rows.length})</button></div>` : ''}`;
+    $('#m').innerHTML = `<div class=mo><div class=md style="width:min(820px,100%)"><h3>เพิ่มผู้ใช้งาน</h3>${tabs}${UA.tab == 'one' ? one : bulk}</div></div>`;
+}
+const uaT = t => { UA.tab = t; uaR(); };
+function uaRole() { return me.role == 'admin' ? g('frl') : 'student'; }
+function uaFile(i) { const f = i.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { UA.text = String(r.result).replace(/^\ufeff/, ''); UA.cid = g('fcl'); if (me.role == 'admin') UA.role = g('frl'); UA.rows = uaParse(UA.text, uaRole()); if (!UA.rows.length) toast('ไม่พบรายชื่อในไฟล์'); uaR(); }; r.readAsText(f); }
+function uaPrev() { UA.text = g('fbk'); UA.cid = g('fcl'); if (me.role == 'admin') UA.role = g('frl'); UA.rows = uaParse(UA.text, uaRole()); if (!UA.rows.length) toast('กรอกรายชื่ออย่างน้อย 1 คน'); uaR(); }
+function uaOne() {
+    const name = g('fnm').trim(); if (!name) return toast('กรอกชื่อ-นามสกุล');
+    const role = uaRole(), used = new Set(D.users.map(u => String(u.u || '').toLowerCase())), un = g('fun').trim(), pw = g('fpw');
+    if (un && used.has(un.toLowerCase())) return toast('ชื่อผู้ใช้นี้ถูกใช้แล้ว');
+    const row = { name, no: g('fno'), u: un || nextU(role == 'teacher' ? 'tch' : 'std', used), p: pw || rpw(), au: !un, ap: !pw }; UA.cid = g('fcl'); mkUsers([row], role, UA.cid);
+}
+const uaGo = () => { UA.cid = g('fcl'); if (me.role == 'admin') UA.role = g('frl'); mkUsers(UA.rows, uaRole(), UA.cid); };
+async function mkUsers(rows, role, cid) {
+    const out = [], c = cid ? D.classes.find(x => x.id == cid) : null, b = $('#ubtn'); if (b) b.disabled = true;
+    for (let i = 0; i < rows.length; i++) {
+        const r = rows[i], pr_ = $('#upg'); if (pr_) pr_.textContent = `กำลังสร้าง ${i + 1}/${rows.length}…`;
+        if (!r.name || r.p.length < 3) { out.push({ ...r, err: 'ข้อมูลไม่ครบ (รหัสผ่านอย่างน้อย 3 ตัว)' }); continue; }
+        if (D.users.some(x => String(x.u).toLowerCase() == r.u.toLowerCase())) { out.push({ ...r, err: 'ชื่อผู้ใช้ซ้ำ' }); continue; }
+        try {
+            const x = await sb2.auth.signUp({ email: em(r.u), password: px(r.p) });
+            if (x.error || !x.data || !x.data.user) { out.push({ ...r, err: /registered|already/i.test((x.error || {}).message || '') ? 'ชื่อผู้ใช้ซ้ำ' : ((x.error || {}).message || 'สร้างไม่สำเร็จ') }); continue; }
+            const id = x.data.user.id; D.users.push({ id, u: r.u, name: r.name, role });
+            if (c) { c.m.push(id); if (+r.no > 0) { c.no = c.no || {}; c.no[id] = +r.no; } }
+            out.push({ ...r, id, ok: 1, cls: c ? c.name + ' ' + c.sub : '' });
+        } catch (e) { out.push({ ...r, err: e.message || 'ผิดพลาด' }); }
+    }
+    await save(); const okc = out.filter(o => o.ok); LASTCRED = okc.length ? okc : LASTCRED; R(); credV(out);
+}
+function credV(l) {
+    const ok = l.filter(x => x.ok), bad = l.filter(x => x.err);
+    wide(`✅ สร้างบัญชีสำเร็จ ${ok.length} คน${bad.length ? ` · ไม่สำเร็จ ${bad.length}` : ''}`, `<p class=mu>รหัสผ่านจะแสดงเฉพาะตอนนี้เท่านั้น (ระบบไม่เก็บรหัสผ่านไว้ดูย้อนหลัง) กรุณาพิมพ์บัตรหรือบันทึกไฟล์ไว้</p><div class=ar style="justify-content:flex-start;margin:0 0 8px"><button class=b onclick="prev(credCards(LASTCRED))">🖨️ พิมพ์บัตรผู้ใช้</button><button class="b g" onclick="credCsv()">Excel</button><button class="b g" onclick="credCopy()">คัดลอก</button></div><div class=tw><table><tr><th>เลขที่</th><th style="text-align:left">ชื่อ</th><th>ชื่อผู้ใช้</th><th>รหัสผ่าน</th><th>สถานะ</th></tr>${l.map(x => `<tr><td>${x.no || '-'}</td><td style="text-align:left">${esc(x.name)}</td><td><code>${esc(x.u)}</code></td><td><code>${x.ok ? esc(x.p) : '-'}</code></td><td>${x.ok ? '<span class="tg ม">สำเร็จ</span>' : `<span class="tg z">${esc(x.err)}</span>`}</td></tr>`).join('')}</table></div>`, 820);
+}
+const credRows = () => [['เลขที่', 'ชื่อ-นามสกุล', 'ห้อง', 'ชื่อผู้ใช้', 'รหัสผ่าน'], ...LASTCRED.map(x => [x.no || '', x.name, x.cls || '', x.u, x.p])];
+const credCsv = () => csv(credRows(), 'บัญชีผู้ใช้');
+const credCopy = () => { const t = credRows().map(r => r.join('\t')).join('\n'); try { navigator.clipboard.writeText(t).then(() => toast('คัดลอกแล้ว')); } catch (e) { toast('คัดลอกไม่สำเร็จ'); } };
+const credCards = l => `<div class=cgrid>${l.filter(x => x.ok || x.u).map(x => `<div class=ccard><b>Classroom Management System</b><div class=cn>${esc(x.name)}</div>${x.cls ? `<div>${esc(x.cls)}${x.no ? ' · เลขที่ ' + x.no : ''}</div>` : ''}<table><tr><td>ชื่อผู้ใช้</td><td><code>${esc(x.u)}</code></td></tr><tr><td>รหัสผ่าน</td><td><code>${esc(x.p)}</code></td></tr></table><small>${esc(location.href.split('#')[0].split('?')[0])}</small></div>`).join('')}</div>`;
+function users() {
+    const adm = me.role == 'admin', f = sel.uf = sel.uf || { role: '', cls: '', q: '', none: 0 }, q = (f.q || '').trim().toLowerCase();
+    let l = visU().filter(u => (!f.role || u.role == f.role) && (!f.cls || (D.classes.find(c => c.id == f.cls) || { m: [] }).m.includes(u.id)) && (!f.none || !D.classes.some(c => c.m.includes(u.id))) && (!q || String(u.name).toLowerCase().includes(q) || String(u.u || '').toLowerCase().includes(q)));
+    l = [...l].sort((a, b) => String(a.name).localeCompare(String(b.name), 'th'));
+    const all = visU(), cs = MC();
+    return head(adm ? 'จัดการผู้ใช้' : 'จัดการนักเรียน', `<button class=b onclick="addU('')">+ เพิ่มผู้ใช้</button> <button class="b g" onclick="addU('','bulk')">📥 นำเข้ารายชื่อ</button>${LASTCRED.length ? ' <button class="b g" onclick="prev(credCards(LASTCRED))">🖨️ บัตรผู้ใช้ล่าสุด</button>' : ''}`)
+        + `<div class=grid>${sc(all.filter(u => u.role == 'student').length, 'นักเรียน')}${adm ? sc(all.filter(u => u.role == 'teacher').length, 'ครู') : ''}${sc(all.filter(u => u.role == 'student' && !D.classes.some(c => c.m.includes(u.id))).length, 'นักเรียนที่ยังไม่มีห้อง')}${sc(cs.length, 'ห้องเรียน')}</div>`
+        + (adm && typeof codesCard == 'function' ? codesCard() : '')
+        + `<div class=card><div class=r4>${adm ? `<label class=fl>บทบาท<select onchange="sel.uf.role=this.value;R()"><option value="">ทั้งหมด</option><option value=student ${f.role == 'student' ? 'selected' : ''}>นักเรียน</option><option value=teacher ${f.role == 'teacher' ? 'selected' : ''}>ครู</option></select></label>` : ''}<label class=fl>ห้องเรียน<select onchange="sel.uf.cls=this.value;R()"><option value="">ทั้งหมด</option>${cs.map(c => `<option value=${c.id} ${f.cls == c.id ? 'selected' : ''}>${esc(c.name + ' ' + c.sub)}</option>`).join('')}</select></label><label class=fl>ค้นหาชื่อ / ชื่อผู้ใช้<input value="${esc(f.q)}" onchange="sel.uf.q=this.value;R()"></label><label style="align-self:end;margin-bottom:12px"><input type=checkbox ${f.none ? 'checked' : ''} onchange="sel.uf.none=this.checked?1:0;R()"> เฉพาะที่ยังไม่มีห้อง</label></div>`
+        + `<div class=ar style="justify-content:flex-start;margin:0 0 8px"><span class=tg>เลือก ${US.filter(id => l.some(u => u.id == id)).length}/${l.length}</span><button class="b s g" onclick="ubulk('enroll')">เพิ่มเข้าห้อง…</button><button class="b s g" onclick="ubulk('csv')">ส่งออก Excel</button>${adm ? '<button class="b s d" onclick="ubulk(\'del\')">ลบที่เลือก</button>' : ''}</div>`
+        + (l.length ? `<div class=tw><table><tr><th><input type=checkbox onchange="usall(this.checked)"></th><th style="text-align:left">ชื่อ</th><th>ชื่อผู้ใช้</th><th>บทบาท</th><th style="text-align:left">ห้องเรียน</th><th></th></tr>${l.map(u => `<tr><td><input type=checkbox ${US.includes(u.id) ? 'checked' : ''} onchange="usel('${u.id}',this.checked)"></td><td style="text-align:left">${avs(u)} ${esc(u.name)}</td><td><code>${esc(u.u || '-')}</code></td><td>${u.role == 'teacher' ? 'ครู' : u.role == 'admin' ? 'แอดมิน' : 'นักเรียน'}</td><td style="text-align:left">${ucls(u).map(c => `<span class=tg>${esc(c.name + ' ' + c.sub)}</span>`).join(' ') || '<span class=mu>-</span>'}</td><td class=ac><label class="b s g">📷<input type=file accept=image/* hidden onchange="setPh('${u.id}',this)"></label><button class="b s g" onclick="ue('${u.id}')">✏️</button>${adm ? `<button class="b s g" onclick="upw2('${u.id}')">🔑</button><button class="b s d" onclick="udel('${u.id}')">🗑</button>` : ''}</td></tr>`).join('')}</table></div>` : emp('ไม่พบผู้ใช้ตามเงื่อนไข')) + '</div>';
+}
+const usel = (id, c) => { US = US.filter(x => x != id); if (c) US.push(id); };
+const usall = c => { const ids = visU().map(u => u.id); US = c ? [...new Set([...US, ...ids])] : []; R(); };
+function ubulk(a) {
+    const l = US.filter(id => D.users.some(u => u.id == id)); if (!l.length) return toast('ยังไม่ได้เลือกผู้ใช้');
+    if (a == 'csv') return csv([['ชื่อ-นามสกุล', 'ชื่อผู้ใช้', 'บทบาท', 'ห้องเรียน'], ...l.map(id => { const u = gu(id); return [u.name, u.u, u.role, ucls(u).map(c => c.name + ' ' + c.sub).join(' / ')]; })], 'รายชื่อผู้ใช้');
+    if (a == 'enroll') return modal('เพิ่ม ' + l.length + ' คน เข้าห้อง', fld('ห้องเรียน', 'f1', '', 'select', MC().map(c => [c.id, c.name + ' ' + c.sub])), 'ubenr()');
+    if (a == 'del') ubdel(l);
+}
+function ubenr() { const c = D.classes.find(x => x.id == g('f1')); if (!c) return; let n = 0; US.forEach(id => { const u = gu(id); if (u && u.role == 'student' && !c.m.includes(id)) { c.m.push(id); n++; } }); save(); cm(); R(); toast(`เพิ่มเข้าห้องแล้ว ${n} คน`); }
+async function ubdel(l) {
+    if (!confirm(`ลบผู้ใช้ ${l.length} คน? การกระทำนี้ย้อนกลับไม่ได้`)) return; let n = 0;
+    for (const id of l) { const { error } = await sb.rpc('admin_delete_user', { target: id }); if (!error) { D.users = D.users.filter(u => u.id != id); D.classes.forEach(c => c.m = c.m.filter(x => x != id)); n++; } }
+    US = []; await save(); R(); toast(`ลบแล้ว ${n}/${l.length} คน`);
+}
+function ue(id) {
+    const u = gu(id), cs = MC(), en = ucls(u), av = cs.filter(c => !c.m.includes(id));
+    modal('แก้ไข: ' + esc(u.name), fld('ชื่อ-นามสกุล', 'f1', u.name) + `<p class=mu>ชื่อผู้ใช้: <code>${esc(u.u || '-')}</code></p><p class=mu>ห้องเรียน:</p>${en.map(c => `<div class=li><span>${esc(c.name + ' ' + c.sub)}</span><button class="b s d" onclick="uerm('${id}','${c.id}')">นำออก</button></div>`).join('') || '<p class=mu>ยังไม่อยู่ในห้องใด</p>'}` + (av.length ? fld('เพิ่มเข้าห้อง', 'f2', '', 'select', [['', '— เลือก —'], ...av.map(c => [c.id, c.name + ' ' + c.sub])]) : ''), `uesv('${id}')`);
+}
+const uerm = (id, cid) => { const c = D.classes.find(x => x.id == cid); c.m = c.m.filter(x => x != id); save(); ue(id); R(); };
+function uesv(id) { const u = gu(id), n = g('f1').trim(); if (!n) return toast('กรอกชื่อ'); u.name = n; const cid = ($('#f2') || {}).value; if (cid) { const c = D.classes.find(x => x.id == cid); if (c && !c.m.includes(id)) c.m.push(id); } save(); cm(); R(); toast('บันทึกแล้ว'); }
+function upw2(id) { const u = gu(id); modal('รีเซ็ตรหัสผ่าน: ' + esc(u.name), `<p class=mu>ชื่อผู้ใช้: <code>${esc(u.u)}</code></p>` + fld('รหัสผ่านใหม่ (ว่าง = สร้างให้อัตโนมัติ)', 'f1'), `upw2s('${id}')`); }
+async function upw2s(id) { const u = gu(id), p = g('f1') || rpw(); if (p.length < 3) return toast('รหัสผ่านอย่างน้อย 3 ตัว'); const { error } = await sb.rpc('admin_set_password', { target: id, pw: px(p) }); if (error) return toast(error.message); LASTCRED = [{ name: u.name, u: u.u, p, ok: 1, cls: ucls(u).map(c => c.name).join(', ') }]; cm(); credV(LASTCRED); }
+function exportRoster(cid) { const c = D.classes.find(x => x.id == cid); csv([['เลขที่', 'ชื่อ-นามสกุล', 'ชื่อผู้ใช้'], ...ms(c).map(u => [rno(c, u), nm(u), (gu(u) || {}).u || ''])], 'รายชื่อ_' + c.name + '_' + c.sub); }
+ 
+/* ==================== สแกน QR งานนักเรียน (ปรับปรุงใหม่ รองรับกล้องหน้า-หลัง) ==================== */
+const QR = { stream: null, det: null, loop: 0, last: '', lt: 0, hist: [], cur: null, busy: 0, want: 0, cameraMode: 'environment' };
+const h32 = id => String(id).replace(/-/g, '');
+const qpay = (t, u) => 'CMS1|' + (t ? t.id : '') + '|' + h32(u);
+const qrSvg = text => { try { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { return '<div class=mu style="padding:30px">QR ใช้งานไม่ได้ (โหลดไลบรารีไม่สำเร็จ)</div>'; } };
+const qcardH = (c, t, u) => `<div class=qcard><div class=qq>${qrSvg(qpay(t, u))}</div><div class=qn>${esc(nm(u))}</div><div class=qs>${rno(c, u) ? 'เลขที่ ' + rno(c, u) + ' · ' : ''}${esc(c.name)}</div><div class=qs><b>${t ? esc(t.t) : 'บัตรประจำตัวนักเรียน'}</b>${t ? ' · เต็ม ' + t.max : ''}</div></div>`;
+const qsheet = (c, t) => `<div class=qgrid>${ms(c).map(u => qcardH(c, t, u)).join('')}</div>`;
+
+function qresolve(txt) {
+    const p = String(txt).trim().split('|'); if (p[0] !== 'CMS1' || p.length < 3) return { err: 'ไม่ใช่ QR ของระบบนี้' };
+    const u = D.users.find(x => h32(x.id) === p[2]); if (!u) return { err: 'ไม่พบนักเรียนคนนี้ในระบบ' };
+    const ids = MC().map(c => c.id); let t = p[1] ? D.tasks.find(x => x.id == p[1]) : D.tasks.find(x => x.id == sel.qt);
+    if (!t) return { err: p[1] ? 'ไม่พบงานนี้ (อาจถูกลบแล้ว)' : 'QR นี้เป็นบัตรนักเรียน กรุณาเลือกงานที่จะให้คะแนนก่อน', u };
+    if (!ids.includes(t.c)) return { err: 'ไม่มีสิทธิ์เข้าถึงงานนี้' };
+    const c = D.classes.find(x => x.id == t.c); if (!c.m.includes(u.id)) return { err: `${u.name} ไม่ได้อยู่ในห้อง ${c.name} ${c.sub}`, u };
+    return { t, u, c };
+}
+
+function qhit(txt) {
+    const now = Date.now(); if (txt === QR.last && now - QR.lt < 2500) return; QR.last = txt; QR.lt = now;
+    const r = qresolve(txt), e = $('#qres'); if (!e) return;
+    if (r.err) { e.innerHTML = `<div class=card style="border-left:4px solid #ef4444"><b>⚠️ ${esc(r.err)}</b></div>`; try { navigator.vibrate && navigator.vibrate(200); } catch (x) {} return; }
+    if (sel.qc != r.c.id) { sel.qc = r.c.id; } sel.qt = r.t.id; qshow(r.t, r.u.id); beep(); try { navigator.vibrate && navigator.vibrate(60); } catch (x) {}
+}
+
+function qshow(t, u) {
+    const c = D.classes.find(x => x.id == t.c), s = t.s[u] || {}, e = $('#qres'), st = tst(t, u), us = gu(u); QR.cur = { t: t.id, u };
+    if (!e) return;
+    e.innerHTML = `<div class=card style="border-left:4px solid #16a34a"><div class=ar style="justify-content:flex-start;margin:0 0 8px"><div class=av style="width:64px;height:64px;font-size:26px;${us.ph ? `background:url(${us.ph}) center/cover` : ''}">${us.ph ? '' : esc((us.name || '?')[0])}</div><div><div style="font-size:22px;font-weight:600">${esc(us.name)}</div><div class=mu>${rno(c, u) ? 'เลขที่ ' + rno(c, u) + ' · ' : ''}${esc(c.name + ' ' + c.sub)}</div></div></div><div class=pill style="margin-bottom:8px"><span class=tg>${esc(t.t)}</span><span class=tg>${CATS[cat(t)]}</span><span class=tg>เต็ม ${t.max}</span><span class="tg ${st == 'ok' ? 'ม' : st == 'miss' ? 'ข' : 'ส'}">${{ ok: 'มีคะแนนแล้ว', wait: 'ส่งแล้ว รอตรวจ', miss: 'ขาดส่ง', todo: 'ยังไม่มีคะแนน', run: 'กำลังสอบ' }[st]}</span></div><label class=fl>คะแนนที่ได้ (เต็ม ${t.max})<input id=qs type=number min=0 max=${t.max} step=any value="${s.g ?? ''}" style="font-size:24px;font-weight:600" onkeydown="if(event.key==='Enter')qsv()"></label><div class=pill style="margin-bottom:10px"><button onclick="qset(${t.max})">เต็ม ${t.max}</button><button onclick="qset(${Math.round(t.max * .75 * 100) / 100})">75%</button><button onclick="qset(${Math.round(t.max * .5 * 100) / 100})">50%</button><button onclick="qset(0)">0</button><button onclick="qadj(-1)">−1</button><button onclick="qadj(1)">+1</button></div><div class=ar><button class="b g" onclick="$('#qres').innerHTML=''">ข้าม</button><button class=b onclick=qsv()>💾 บันทึก & สแกนคนต่อไป</button></div></div>`;
+    const i = $('#qs'); if (i) { i.focus(); i.select(); }
+}
+
+const qset = v => { $('#qs').value = v; }, qadj = d => { const i = $('#qs'); i.value = Math.max(0, (+i.value || 0) + d); };
+function qsv() {
+    if (!QR.cur) return; const t = D.tasks.find(x => x.id == QR.cur.t), u = QR.cur.u, v = g('qs');
+    if (v === '' || isNaN(+v)) return toast('กรอกคะแนนเป็นตัวเลข'); const old = t.s[u], n = { ...(old || {}), t: (old || {}).t || today(), g: Math.max(0, Math.min(+v, t.max)) }; delete n.run; t.s[u] = n; save();
+    QR.hist.unshift({ time: new Date(), tid: t.id, u, g: n.g }); QR.cur = null; beep(); const e = $('#qres'); if (e) e.innerHTML = `<div class=card style="border-left:4px solid #16a34a"><b>✅ บันทึก ${esc(nm(u))} = ${n.g}/${t.max} แล้ว</b><p class=mu>พร้อมสแกนคนต่อไป</p></div>`; qhist();
+}
+
+const qhist = () => { const e = $('#qhist'); if (e) e.innerHTML = qhtml(); };
+const qhtml = () => QR.hist.slice(0, 30).map(h => { const t = D.tasks.find(x => x.id == h.tid); return t ? `<div class=li><span>${esc(nm(h.u))}<br><small class=mu>${esc(t.t)} · ${h.time.toLocaleTimeString('th-TH')}</small></span><span><b>${h.g}/${t.max}</b> <button class="b s g" onclick="qshow(D.tasks.find(x=>x.id=='${t.id}'),'${h.u}')">แก้ไข</button></span></div>` : ''; }).join('') || '<p class=mu>ยังไม่มีการสแกนในรอบนี้</p>';
+
+async function qstart(mode) {
+    try {
+        const v = $('#qv'); if (!v) return;
+        if (mode) QR.cameraMode = mode;
+        qstop(false);
+
+        const constraints = {
+            video: {
+                facingMode: QR.cameraMode === 'user' ? 'user' : { ideal: 'environment' },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: false
+        };
+
+        QR.stream = await navigator.mediaDevices.getUserMedia(constraints);
+        v.srcObject = QR.stream;
+        await v.play();
+        QR.want = 1;
+
+        if ('BarcodeDetector' in window) {
+            try { QR.det = new BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { QR.det = null; }
+        }
+        if (!QR.det) await qlib();
+
+        clearInterval(QR.loop);
+        QR.loop = setInterval(qtick, 220);
+        
+        const b = $('#qbtn'); if (b) b.textContent = '⏹ หยุดกล้อง';
+        const camLabel = $('#camLabel');
+        if (camLabel) camLabel.textContent = QR.cameraMode === 'user' ? '📷 กล้องหน้า' : '📷 กล้องหลัง';
+    } catch (e) {
+        toast('เปิดกล้องไม่ได้: ' + (e.message || e) + ' (ลองเปลี่ยนโหมดกล้องหรือใช้ช่องกรอกพิมพ์รหัส)');
+        QR.want = 0;
+    }
+}
+
+function qswitchCam() {
+    const newMode = QR.cameraMode === 'user' ? 'environment' : 'user';
+    qstart(newMode);
+}
+
+function qstop(full) {
+    clearInterval(QR.loop);
+    QR.loop = 0;
+    if (QR.stream) {
+        QR.stream.getTracks().forEach(t => t.stop());
+        QR.stream = null;
+    }
+    if (full !== false) QR.want = 0;
+    const b = $('#qbtn'); if (b) b.textContent = '📷 เปิดกล้องสแกน';
+}
+
+const qtog = () => { if (QR.stream) { qstop(true); } else { qstart(); } };
+
+const qlib = () => new Promise(ok => {
+    if (window.jsQR) return ok();
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+    s.onload = ok;
+    s.onerror = () => { toast('โหลดตัวสแกนไม่สำเร็จ ใช้ช่องกรอกรหัสแทนได้'); ok(); };
+    document.head.appendChild(s);
+});
+
+async function qtick() {
+    const v = $('#qv'); if (!v || v.readyState < 2 || QR.busy) return; QR.busy = 1;
+    try {
+        let txt = '';
+        if (QR.det) {
+            const r = await QR.det.detect(v);
+            if (r.length) txt = r[0].rawValue;
+        } else if (window.jsQR) {
+            const c = QR.cv || (QR.cv = document.createElement('canvas'));
+            c.width = v.videoWidth;
+            c.height = v.videoHeight;
+            const x = c.getContext('2d', { willReadFrequently: true });
+            x.drawImage(v, 0, 0);
+            const d = x.getImageData(0, 0, c.width, c.height), r = jsQR(d.data, c.width, c.height);
+            if (r) txt = r.data;
+        }
+        if (txt) qhit(txt);
+    } catch (e) {}
+    QR.busy = 0;
+}
+
+function qman(v) {
+    v = String(v).trim(); if (!v) return; if (v.startsWith('CMS1')) return qhit(v);
+    const c = D.classes.find(x => x.id == sel.qc), t = D.tasks.find(x => x.id == sel.qt), e = $('#qres');
+    if (!c || !t) return toast('เลือกห้องและงานก่อน');
+    const l = /^\d+$/.test(v) ? c.m.filter(u => String(rno(c, u)) == v) : c.m.filter(u => nm(u).toLowerCase().includes(v.toLowerCase()));
+    if (l.length == 1) {
+        qshow(t, l[0]); const m = $('#qm'); if (m) m.value = '';
+    } else if (e) {
+        e.innerHTML = l.length ? `<div class=card><b>เลือกนักเรียน</b>${l.map(u => `<div class=li><span>${esc(lbl(c, u))}</span><button class="b s" onclick="qshow(D.tasks.find(x=>x.id=='${t.id}'),'${u}')">เลือก</button></div>`).join('')}</div>` : `<div class=card style="border-left:4px solid #ef4444"><b>ไม่พบนักเรียน “${esc(v)}” ในห้องนี้</b></div>`;
+    }
+}
+
+function qrV() {
+    const cs = MC(); if (!cs.length) return head('สแกน QR งานนักเรียน') + emp('ยังไม่มีห้องเรียน');
+    const pk = cpick(cs, 'qc'), c = cs.find(x => x.id == sel.qc), tk = scTasks(c, '');
+    sel.qv = sel.qv || 's'; sel.qt = tk.find(t => t.id == sel.qt) ? sel.qt : (tk[0] || {}).id;
+    const t = D.tasks.find(x => x.id == sel.qt), tsel = `<label class=fl>งานที่จะให้คะแนน<select onchange="sel.qt=this.value;R()">${tk.map(x => `<option value=${x.id} ${x.id == sel.qt ? 'selected' : ''}>[${CATS[cat(x)]}] ${esc(x.t)} (เต็ม ${x.max})</option>`).join('') || '<option value="">— ยังไม่มีงาน —</option>'}</select></label>`;
+    const tabs = [['s', '📷 สแกนให้คะแนน'], ['p', '🖨️ พิมพ์ QR นักเรียน'], ['h', '🕘 ประวัติการสแกน']];
+    let b = '';
+    if (sel.qv == 's') b = `<div class=wheelbox><div class=card><div style="position:relative;width:100%;overflow:hidden;border-radius:14px;background:#000;"><video id=qv playsinline muted style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;"></video><span id="camLabel" class="tg" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);color:#fff;">${QR.cameraMode==='user'?'📷 กล้องหน้า':'📷 กล้องหลัง'}</span></div><div class=ar style="justify-content:center;margin-top:12px;gap:8px;"><button class=b id=qbtn onclick=qtog()>${QR.stream ? '⏹ หยุดกล้อง' : '📷 เปิดกล้องสแกน'}</button><button class="b g" onclick="qswitchCam()">🔄 สลับกล้อง (หน้า/หลัง)</button></div><p class=mu style="text-align:center;margin-top:8px;">เล็ง QR บนชิ้นงานให้อยู่ในกรอบ ระบบจะดึงข้อมูลให้อัตโนมัติ</p><label class=fl style="margin-top:10px;">หรือพิมพ์ เลขที่ / ชื่อ / สแกนบาร์โค้ด แล้วกด Enter<input id=qm placeholder="เช่น 12" onkeydown="if(event.key==='Enter')qman(this.value)"></label></div><div><div id=qres><div class=card><p class=mu>ยังไม่ได้สแกน — ผลจะแสดงตรงนี้ พร้อมช่องให้คะแนน</p></div></div><div class=card><h3>สแกนล่าสุด</h3><div id=qhist>${qhtml()}</div></div></div></div>`;
+    if (sel.qv == 'p') b = `<div class=card><p class=mu>QR สร้างอัตโนมัติจากข้อมูลในระบบ ไม่ต้องบันทึกเพิ่ม · นำไปติดชิ้นงาน/ใบงาน แล้วสแกนเพื่อให้คะแนนได้ทันที</p><div class=pill style="margin:6px 0"><button class="${sel.qm != 'id' ? 'on n' : ''}" onclick="sel.qm='task';R()">ผูกกับงานที่เลือก</button><button class="${sel.qm == 'id' ? 'on n' : ''}" onclick="sel.qm='id';R()">บัตรประจำตัว (ใช้ได้ทุกงาน)</button></div><div class=ar style="justify-content:flex-start"><button class=b onclick="prev(qsheet(D.classes.find(x=>x.id=='${c.id}'),${sel.qm == 'id' ? 'null' : `D.tasks.find(x=>x.id=='${sel.qt}')`}))">🖨️ พิมพ์ QR ทั้งห้อง (${c.m.length})</button></div></div>${c.m.length ? `<div class=qgrid screen>${ms(c).map(u => qcardH(c, sel.qm == 'id' ? null : t, u)).join('')}</div>` : emp('ห้องนี้ยังไม่มีนักเรียน')}`;
+    if (sel.qv == 'h') b = `<div class=card>${qhtml()}</div>`;
+    return head('📷 สแกน QR งานนักเรียน') + `<div class=card>${pk}${tsel}<div class=pill>${tabs.map(x => `<button class="${sel.qv == x[0] ? 'on n' : ''}" onclick="sel.qv='${x[0]}';R()">${x[1]}</button>`).join('')}</div></div>` + b;
+}
+const myQR = () => { const cs = MC(); wide('QR ของฉัน', `<div style="text-align:center"><div style="width:240px;margin:auto">${qrSvg(qpay(null, me.id))}</div><h3 style="margin-top:8px">${esc(me.name)}</h3><p class=mu>ให้ครูสแกนเพื่อเรียกชื่อและให้คะแนนในระบบ</p></div>`, 420); };
+ 
+const ACT = { t: Date.now() }; let SYNCING = 0;
+['keydown', 'input', 'click', 'touchstart'].forEach(e => document.addEventListener(e, () => ACT.t = Date.now(), true));
+const dsig = () => { const by = (a, k) => [...a].sort((x, y) => String(x[k]).localeCompare(String(y[k]))); return sj({ u: by(D.users, 'id'), c: by(D.classes, 'id').map(c => ({ ...c, m: [...c.m].sort() })), a: D.att, t: by(D.tasks, 'id'), n: by(D.notes, 'id'), k: D.codes }); };
+function softR() { const y = scrollY, tw = [...document.querySelectorAll('.tw')].map(e => e.scrollLeft), s0 = (document.querySelector('.side') || {}).scrollTop; R(); document.querySelectorAll('.tw').forEach((e, i) => e.scrollLeft = tw[i] || 0); const s = document.querySelector('.side'); if (s) s.scrollTop = s0 || 0; scrollTo(0, y); }
+async function autoSync() {
+    if (!me || document.hidden || PEND > 0 || AT.t || WH.spin || QR.stream || SYNCING) return;
+    if ($('#m').innerHTML || $('#m2').innerHTML || Date.now() - ACT.t < 6000) return;
+    const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;
+    SYNCING = 1; try { const before = dsig(); if (!await loadD()) return; reme(); if (dsig() !== before) softR(); } finally { SYNCING = 0; }
+}
+setInterval(autoSync, 45000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(autoSync, 1500); });
+{ const _R3 = R; R = function () { _R3(); if (V != 'qr') qstop(true); else if (QR.want) setTimeout(qstart, 60); }; }
+ 
+        window.onerror = m => { console.error(m); toast('เกิดข้อผิดพลาด: ' + m); };
+ 
+       loadCloudData();
+    </script>
+</body>
+</html>
